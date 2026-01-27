@@ -8,21 +8,12 @@ import Container from '@mui/material/Container'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 function App() {
   const [count, setCount] = useState(0)
 
-  const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#1976d2',
-      },
-    },
-  })
-
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <AppBar position="static">
         <Toolbar>
           <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
@@ -37,10 +28,10 @@ function App() {
 
       <Container sx={{ mt: 4 }}>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
-          <a href="https://vite.dev" target="_blank">
+          <a href="https://vite.dev" target="_blank" rel="noreferrer">
             <img src="/vite.svg" className="logo" alt="Vite logo" />
           </a>
-          <a href="https://react.dev" target="_blank">
+          <a href="https://react.dev" target="_blank" rel="noreferrer">
             <img src={reactLogo} className="logo react" alt="React logo" />
           </a>
         </div>
@@ -61,7 +52,7 @@ function App() {
           Click on the Vite and React logos to learn more
         </Typography>
       </Container>
-    </ThemeProvider>
+    </>
   )
 }
 
