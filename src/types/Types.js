@@ -7,6 +7,14 @@
  */
 
 /**
+ * @typedef {Object} Company
+ * @property {string} id - Unique company identifier
+ * @property {string} name - Company display name
+ * @property {string} [companyLogo] - URL to the company logo (optional)
+ * @property {string} [website] - Company website (optional)
+ */
+
+/**
  * @typedef {Object} JobApplication
  * @property {string} id - Unique identifier
  * @property {string} companyName - Name of the company
@@ -28,4 +36,3 @@
  * @property {number} [offerAmount] - Offered salary amount
  * @property {string} [offerCurrency] - Currency of the offer (e.g., 'ILS', 'USD', 'EUR')
  */
-
