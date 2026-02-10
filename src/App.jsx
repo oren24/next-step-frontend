@@ -1,59 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import Container from '@mui/material/Container'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import MenuIcon from '@mui/icons-material/Menu'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Layout from './components/layout/Layout';
+import JobApplications from './pages/JobApplications';
+import Resumes from './pages/Resumes';
+import Subscriptions from './pages/Subscriptions';
+import Archive from './pages/Archive';
+import Settings from './pages/Settings';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function App({ isDarkMode, onToggleTheme }) {
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Nextstep Project
-          </Typography>
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </AppBar>
-
-      <Container sx={{ mt: 4 }}>
-        <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 24 }}>
-          <a href="https://vite.dev" target="_blank" rel="noreferrer">
-            <img src="/vite.svg" className="logo" alt="Vite logo" />
-          </a>
-          <a href="https://react.dev" target="_blank" rel="noreferrer">
-            <img src={reactLogo} className="logo react" alt="React logo" />
-          </a>
-        </div>
-
-        <Typography variant="h4" gutterBottom>
-          Vite + React + MUI
-        </Typography>
-
-        <Button variant="contained" color="primary" onClick={() => setCount((c) => c + 1)}>
-          count is {count}
-        </Button>
-
-        <Typography sx={{ mt: 2 }}>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </Typography>
-
-        <Typography className="read-the-docs" sx={{ mt: 3 }}>
-          Click on the Vite and React logos to learn more
-        </Typography>
-      </Container>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={<Layout isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />}
+        >
+          <Route index element={<JobApplications />} />
+          <Route path="resumes" element={<Resumes />} />
+          <Route path="subscriptions" element={<Subscriptions />} />
+          <Route path="archive" element={<Archive />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
