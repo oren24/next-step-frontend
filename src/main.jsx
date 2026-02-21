@@ -6,7 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { getTheme } from './theme';
 
-function Root() {
+export function Root() {
   const [mode, setMode] = useState('dark');
 
   const theme = useMemo(() => getTheme(mode), [mode]);
@@ -24,5 +24,7 @@ function Root() {
     </StrictMode>
   );
 }
+
+export default Root;
 
 createRoot(document.getElementById('root')).render(<Root />);

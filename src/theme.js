@@ -2,7 +2,6 @@ import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 
 // Match the project's CSS design language (see src/index.css and src/App.css)
-const systemFont = 'system-ui, Avenir, Helvetica, Arial, sans-serif';
 const spaceGroteskFont = '"Space Grotesk", sans-serif';
 const interFont = '"Inter", sans-serif';
 
