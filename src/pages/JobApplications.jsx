@@ -7,7 +7,7 @@ import {PointerSensor, TouchSensor} from '@dnd-kit/core';
 import DraggableItem from '../components/cards/DraggableItem.jsx';
 import ApplicationCard from '../components/cards/ApplicationCard.jsx';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
-import {BOARD, STATUS_COLORS} from './styles/jobApplicationsStyles';
+import {BOARD, STATUS_COLORS, EMPTY_STATE_GRADIENTS} from './styles/jobApplicationsStyles';
 
 const STATUS_ORDER = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
@@ -108,25 +108,59 @@ const Column = ({status, appsInColumn = [], updateAppStatus}) => {
             '--card-bg': colors.cardBg,
           }}
         >
-          {appsInColumn.map((app) => {
-            const leftStatus = STATUS_ORDER[Math.max(0, STATUS_ORDER.indexOf(status) - 1)];
-            const rightStatus = STATUS_ORDER[Math.min(STATUS_ORDER.length - 1, STATUS_ORDER.indexOf(status) + 1)];
-
-            return (
-              <DraggableItem
-                key={app.id}
-                app={app}
-                leftStatus={leftStatus}
-                rightStatus={rightStatus}
-                updateAppStatus={(id, toStatus) => {
-                  if (toStatus) return updateAppStatus(id, toStatus);
-                  return null;
+          {appsInColumn.length === 0 ? (
+            // Empty State Card
+            <Box
+              sx={{
+                ...BOARD.emptyStateCard,
+                borderColor: colors.header,
+                background: EMPTY_STATE_GRADIENTS[status],
+              }}
+            >
+              <Box
+                component="img"
+                src={statusIcons[status]}
+                sx={{
+                  ...BOARD.emptyStateIcon,
+                  filter: iconStyles[status]?.filter,
                 }}
-                isFirst={status === STATUS_ORDER[0]}
-                isLast={status === STATUS_ORDER.at(-1)}
               />
-            );
-          })}
+              <Typography
+                sx={{
+                  ...BOARD.emptyStateText,
+                  color: colors.header,
+                }}
+              >
+                {`Drag Your First ${
+                  status === 'Wishlist' ? 'Wishlist Item' :
+                  status === 'Applied' ? 'Applied Job' :
+                  status === 'Interviewing' ? 'Interview' :
+                  status === 'Rejected' ? 'Rejected Job' :
+                  status
+                } Here!`}
+              </Typography>
+            </Box>
+          ) : (
+            appsInColumn.map((app) => {
+              const leftStatus = STATUS_ORDER[Math.max(0, STATUS_ORDER.indexOf(status) - 1)];
+              const rightStatus = STATUS_ORDER[Math.min(STATUS_ORDER.length - 1, STATUS_ORDER.indexOf(status) + 1)];
+
+              return (
+                <DraggableItem
+                  key={app.id}
+                  app={app}
+                  leftStatus={leftStatus}
+                  rightStatus={rightStatus}
+                  updateAppStatus={(id, toStatus) => {
+                    if (toStatus) return updateAppStatus(id, toStatus);
+                    return null;
+                  }}
+                  isFirst={status === STATUS_ORDER[0]}
+                  isLast={status === STATUS_ORDER.at(-1)}
+                />
+              );
+            })
+          )}
         </Stack>
       </SortableContext>
     </Paper>

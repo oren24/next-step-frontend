@@ -10,6 +10,15 @@ export const STATUS_COLORS = {
   Rejected: { header: '#9CA3AF', headerBg: 'rgba(156,163,175,0.12)', cardBg: 'transparent', border: '#9CA3AF' },
 };
 
+// Empty state gradients for each status
+export const EMPTY_STATE_GRADIENTS = {
+  Wishlist: 'linear-gradient(135deg, rgba(121, 80, 242, 0.05) 0%, rgba(129, 143, 248, 0.15) 100%)',
+  Applied: 'linear-gradient(135deg, rgba(250, 82, 82, 0.05) 0%, rgba(248, 113, 113, 0.15) 100%)',
+  Interviewing: 'linear-gradient(135deg, rgba(250, 176, 5, 0.05) 0%, rgba(251, 191, 36, 0.15) 100%)',
+  Offer: 'linear-gradient(135deg, rgba(34, 230, 86, 0.05) 0%, rgba(52, 211, 153, 0.15) 100%)',
+  Rejected: 'linear-gradient(135deg, rgba(156, 163, 175, 0.05) 0%, rgba(156, 163, 175, 0.15) 100%)',
+};
+
 export const BOARD = {
   container: {
     width: '100%',
@@ -207,5 +216,40 @@ export const BOARD = {
   },
   rejectedPlusIcon: {
     filter: 'brightness(0) saturate(100%) invert(67%) sepia(7%) saturate(928%) hue-rotate(169deg) brightness(96%) contrast(88%)',
+  },
+  // Empty State Card Styles
+  emptyStateCard: {
+    width: 335,
+    height: 196,
+    opacity: 1,
+    borderRadius: '10px',
+    border: '1px dashed',
+    borderColor: 'var(--header-color, transparent)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '16px',
+    padding: '35px 24px',
+    background: 'var(--empty-state-bg, transparent)',
+    cursor: 'default',
+    userSelect: 'none',
+    pointerEvents: 'none',
+  },
+  emptyStateIcon: {
+    width: 66,
+    height: 66,
+    opacity: 1,
+  },
+  emptyStateText: {
+    width: 267,
+    height: 23,
+    fontFamily: 'Space Grotesk',
+    fontWeight: 500,
+    fontSize: '18px',
+    lineHeight: '100%',
+    letterSpacing: '0%',
+    textAlign: 'center',
+    opacity: 1,
   },
 };
