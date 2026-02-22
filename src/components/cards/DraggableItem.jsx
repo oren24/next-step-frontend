@@ -20,6 +20,7 @@ export default function DraggableItem({ app, leftStatus, rightStatus, updateAppS
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <ApplicationCard
         app={app}
+        status={app.status}
         onMoveLeft={(id) => updateAppStatus(id, leftStatus)}
         onMoveRight={(id) => updateAppStatus(id, rightStatus)}
         isFirst={isFirst}

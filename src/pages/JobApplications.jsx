@@ -25,6 +25,33 @@ const Column = ({status, appsInColumn = [], updateAppStatus}) => {
   const {isOver, setNodeRef} = useDroppable({id: status});
   const colors = STATUS_COLORS[status] || STATUS_COLORS.Wishlist;
 
+  // Define icon paths for each status
+  const statusIcons = {
+    'Wishlist': '/src/assets/main section icons/material-symbols_bookmark-outline.svg',
+    'Applied': '/src/assets/main section icons/Vector.svg',
+    'Interviewing': '/src/assets/main section icons/Group.svg', 
+    'Offer': '/src/assets/main section icons/material-symbols_trophy-outline.svg',
+    'Rejected': '/src/assets/main section icons/material-symbols_bookmark-outline.svg' // fallback
+  };
+
+  // Define icon styles for each status
+  const iconStyles = {
+    'Wishlist': BOARD.wishlistIcon,
+    'Applied': BOARD.appliedIcon,
+    'Interviewing': BOARD.interviewingIcon,
+    'Offer': BOARD.offerIcon,
+    'Rejected': BOARD.rejectedIcon
+  };
+
+  // Define plus icon styles for each status
+  const plusIconStyles = {
+    'Wishlist': BOARD.wishlistPlusIcon,
+    'Applied': BOARD.appliedPlusIcon,
+    'Interviewing': BOARD.interviewingPlusIcon,
+    'Offer': BOARD.offerPlusIcon,
+    'Rejected': BOARD.rejectedPlusIcon
+  };
+
   return (
     <Paper elevation={1} sx={BOARD.columnPaper}>
       <Box
@@ -35,10 +62,38 @@ const Column = ({status, appsInColumn = [], updateAppStatus}) => {
           '--header-color': colors.header,
           '--header-bg': colors.headerBg,
           '--card-bg': colors.cardBg,
+          position: 'relative',
+          ...BOARD.statusHeader
         }}
       >
-        <Typography variant="subtitle1" sx={BOARD.columnTitle}>{status}</Typography>
-        <Typography variant="subtitle2" sx={BOARD.columnCount}>({appsInColumn.length})</Typography>
+        {status !== 'Rejected' && (
+          <Box
+            component="img"
+            src={statusIcons[status]}
+            sx={{
+              ...BOARD.baseStatusIcon,
+              ...iconStyles[status],
+            }}
+          />
+        )}
+        <Typography 
+          variant="subtitle1" 
+          sx={{
+            ...BOARD.columnTitle,
+            ...BOARD.statusTitle,
+            color: colors.header,
+          }}
+        >
+          {status === 'Wishlist' ? 'Wishlist' : status}
+        </Typography>
+        <Box
+          component="img"
+          src="/src/assets/main section icons/plus.svg"
+          sx={{
+            ...BOARD.basePlusIcon,
+            ...plusIconStyles[status],
+          }}
+        />
       </Box>
 
       <SortableContext items={appsInColumn.map((a) => a.id)} strategy={rectSortingStrategy}>
@@ -156,7 +211,7 @@ export default function JobApplications() {
         <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
           {activeItem ? (
             <Box sx={{width: 340, pointerEvents: 'none'}}>
-              <ApplicationCard app={activeItem} onMoveLeft={() => {}} onMoveRight={() => {}}/>
+              <ApplicationCard app={activeItem} status={activeItem.status} onMoveLeft={() => {}} onMoveRight={() => {}}/>
             </Box>
           ) : null}
         </DragOverlay>

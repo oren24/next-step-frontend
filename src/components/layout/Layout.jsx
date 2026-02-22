@@ -41,7 +41,15 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
           onCollapse={handleSidebarCollapse}
         />
       ) : (
-        <Sidebar variant="permanent" onCollapse={handleSidebarCollapse} />
+        <Box
+          sx={{
+            width: drawerWidth,
+            flexShrink: 0,
+            transition: 'width 0.3s ease-in-out',
+          }}
+        >
+          <Sidebar variant="permanent" onCollapse={handleSidebarCollapse} />
+        </Box>
       )}
 
       {/* Main Content Area */}
@@ -49,11 +57,11 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
         component="main"
         sx={{
           flexGrow: 1,
-          // instead of shrinking width by the drawer, offset the content with margin-left so child maxWidth works
-          ml: { md: `${drawerWidth}px` },
+          minWidth: 0, // Prevents flex item from overflowing
           minHeight: '100vh',
           bgcolor: 'background.paper',
-          transition: '0.3s ease-in-out',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {/* Top Bar */}
@@ -65,8 +73,15 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
           sidebarCollapsed={sidebarCollapsed}
         />
 
-        {/* Page Content - add responsive inner container to center content and control max width */}
-        <Box sx={{ mt: '94px', px: { xs: 1, sm: 2, md: 3 }, pb: { xs: 6, md: 3 } }}>
+        {/* Page Content */}
+        <Box 
+          sx={{ 
+            flex: 1,
+            mt: '94px', 
+            px: { xs: 1, sm: 2, md: 3 }, 
+            pb: { xs: 6, md: 3 } 
+          }}
+        >
           <Box sx={{ width: '100%' }}>
             <Outlet />
           </Box>
