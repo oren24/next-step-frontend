@@ -21,7 +21,7 @@ export const BOARD = {
   // columns wrapper is column on mobile (stacked), row with horizontal scroll on md+
   columnsWrapper: {
     display: 'flex',
-    gap: 3,
+    gap: 1,
     alignItems: 'flex-start',
     overflowX: 'auto',
     pb: 2,
