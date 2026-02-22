@@ -44,7 +44,8 @@ export const TYPOGRAPHY = {
     fontFamily: '"Inter", sans-serif', 
     fontSize: '20px', 
     fontWeight: 400, 
-    lineHeight: '100%' 
+    lineHeight: '100%',
+    letterSpacing: '0%'
   },
 };
 

@@ -6,6 +6,7 @@ import {rectSortingStrategy, SortableContext} from '@dnd-kit/sortable';
 import {PointerSensor, TouchSensor} from '@dnd-kit/core';
 import DraggableItem from '../components/cards/DraggableItem.jsx';
 import ApplicationCard from '../components/cards/ApplicationCard.jsx';
+import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
 import {BOARD, STATUS_COLORS} from './styles/jobApplicationsStyles';
 
 const STATUS_ORDER = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
@@ -134,6 +135,7 @@ const Column = ({status, appsInColumn = [], updateAppStatus}) => {
 
 export default function JobApplications() {
   const [apps, setApps] = useState(() => mockApplications.map((a) => ({...a})));
+  const [currentView, setCurrentView] = useState('kanban');
 
   const columns = useMemo(() => buildColumns(apps), [apps]);
 
@@ -199,23 +201,45 @@ export default function JobApplications() {
   // Helper to find the active item object for the overlay
   const activeItem = activeId ? apps.find((a) => a.id === activeId) : null;
 
+  const handleViewChange = (view) => {
+    setCurrentView(view);
+  };
+
   return (
     <Box sx={BOARD.container}>
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <Box sx={BOARD.columnsWrapper}>
-          {STATUS_ORDER.map((status) => (
-            <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus}/>
-          ))}
+      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} />
+      
+      {currentView === 'list' ? (
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '400px',
+            fontSize: '24px',
+            fontWeight: 600,
+            color: 'text.primary'
+          }}
+        >
+          TBD
         </Box>
+      ) : (
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <Box sx={BOARD.columnsWrapper}>
+            {STATUS_ORDER.map((status) => (
+              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus}/>
+            ))}
+          </Box>
 
-        <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
-          {activeItem ? (
-            <Box sx={{width: 340, pointerEvents: 'none'}}>
-              <ApplicationCard app={activeItem} status={activeItem.status} onMoveLeft={() => {}} onMoveRight={() => {}}/>
-            </Box>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
+            {activeItem ? (
+              <Box sx={{width: 340, pointerEvents: 'none'}}>
+                <ApplicationCard app={activeItem} status={activeItem.status} onMoveLeft={() => {}} onMoveRight={() => {}}/>
+              </Box>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      )}
     </Box>
   );
 }

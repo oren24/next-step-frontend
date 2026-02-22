@@ -4,17 +4,19 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Card, CardContent, Avatar, Chip, Button, Stack, Typography } from '@mui/material';
+import { Box, Card, CardContent, Avatar, Chip, Button, Stack, Typography, useTheme } from '@mui/material';
 import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
 
 export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   // Use gradient background if status is provided, otherwise use default
-  const cardStyle = status && STATUS_GRADIENTS[status] 
+  const cardStyle = status && STATUS_GRADIENTS[isDarkMode ? 'dark' : 'light'][status]
     ? { 
         ...CARD.rootWithGradient, 
-        background: STATUS_GRADIENTS[status] 
+        background: STATUS_GRADIENTS[isDarkMode ? 'dark' : 'light'][status] 
       }
     : CARD.root;
 

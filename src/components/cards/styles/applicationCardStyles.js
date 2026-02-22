@@ -1,12 +1,21 @@
 import { GRADIENTS } from '../../layout/styles/sidebarStyles';
 
-// Status-specific gradient backgrounds
+// Status-specific gradient backgrounds for light and dark modes
 export const STATUS_GRADIENTS = {
-  Wishlist: 'linear-gradient(180deg, #EBE4FF 0%, #F4F2FA 100%)',
-  Applied: 'linear-gradient(180deg, #FFD3D3 0%, #FAF6F2 100%)',
-  Interviewing: 'linear-gradient(180deg, #FDF4E1 0%, #FAF6F2 100%)',
-  Offer: 'linear-gradient(180deg, #D1FAE5 0%, #F4F2FA 100%)',
-  Rejected: 'linear-gradient(180deg, #F3F4F6 0%, #F9FAFB 100%)',
+  light: {
+    Wishlist: 'linear-gradient(180deg, #EBE4FF 0%, #F4F2FA 100%)',
+    Applied: 'linear-gradient(180deg, #FFD3D3 0%, #FAF6F2 100%)',
+    Interviewing: 'linear-gradient(180deg, #FDF4E1 0%, #FAF6F2 100%)',
+    Offer: 'linear-gradient(180deg, #D1FAE5 0%, #F4F2FA 100%)',
+    Rejected: 'linear-gradient(180deg, #F3F4F6 0%, #F9FAFB 100%)',
+  },
+  dark: {
+    Wishlist: 'linear-gradient(180deg, #3C366B 0%, #2A2438 100%)',
+    Applied: 'linear-gradient(180deg, #5D2C2C 0%, #3A2626 100%)',
+    Interviewing: 'linear-gradient(180deg, #5D4A2C 0%, #3A3126 100%)',
+    Offer: 'linear-gradient(180deg, #2C5D3C 0%, #263A2F 100%)',
+    Rejected: 'linear-gradient(180deg, #404040 0%, #2D2D2D 100%)',
+  }
 };
 
 export const CARD = {
@@ -53,14 +62,14 @@ export const CARD = {
     height: 32, 
     borderRadius: 2, 
     position: 'absolute',
-    top: '22px',
-    left: '12px',
+    top: '17px',
+    left: '10px',
     opacity: 1
   },
   titleContainer: {
     position: 'absolute',
-    top: '19px',
-    left: '53px',
+    top: '13px',
+    left: '50px',
     width: 186,
     height: 37,
     opacity: 1
@@ -72,7 +81,7 @@ export const CARD = {
   // Three dots menu button - dots always visible, background only on hover/click
   menuButton: {
     position: 'absolute',
-    top: '6px',
+    top: '10px',
     right: '8px',
     width: 26,
     height: 26,
@@ -97,7 +106,7 @@ export const CARD = {
     right: '12px',
     width: 192,
     height: 148,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'background.paper',
     borderRadius: '10px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     padding: '20px',
@@ -106,6 +115,8 @@ export const CARD = {
     gap: '10px',
     zIndex: 1001,
     opacity: 1,
+    border: '1px solid',
+    borderColor: 'divider',
   },
   // Menu items
   menuItem: {
@@ -122,7 +133,7 @@ export const CARD = {
     fontSize: '18px',
     lineHeight: '100%',
     letterSpacing: '0%',
-    color: '#3A3A3A',
+    color: 'text.primary',
   },
   deletemenuItemText: {
     fontFamily: 'Inter',
@@ -151,10 +162,12 @@ export const CARD = {
     pr: '2px',
     pb: '2px',
     pl: '2px',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'background.paper',
     color: 'text.primary',
     fontSize: '12px',
     fontWeight: 500,
+    border: '1px solid',
+    borderColor: 'divider',
   },
   metaText: { color: 'text.secondary', fontSize: '12px' },
   locationText: { color: 'text.secondary', fontSize: '12px' }
