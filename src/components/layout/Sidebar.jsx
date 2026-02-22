@@ -9,15 +9,8 @@ import {
   getDrawerStyle, 
   getTemporaryDrawerStyle 
 } from './styles/sidebarStyles';
-import {
-  SECTION_LABEL,
-  navigationItems,
-  bottomNavigationItems,
-  SidebarLogo,
-  NavigationItem,
-  SettingsItem,
-  CollapseToggle,
-} from './SidebarUtils';
+import { navigationItems, bottomNavigationItems, SECTION_LABEL } from './sidebarConstants';
+import { SidebarLogo, NavigationItem, SettingsItem, CollapseToggle } from './SidebarUtils';
 
 export default function Sidebar({ open, onClose, variant = 'permanent', onCollapse }) {
   const navigate = useNavigate();

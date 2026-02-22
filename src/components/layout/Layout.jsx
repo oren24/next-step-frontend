@@ -49,10 +49,11 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
         component="main"
         sx={{
           flexGrow: 1,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          // instead of shrinking width by the drawer, offset the content with margin-left so child maxWidth works
+          ml: { md: `${drawerWidth}px` },
           minHeight: '100vh',
           bgcolor: 'background.paper',
-          transition: 'width 0.3s ease-in-out',
+          transition: '0.3s ease-in-out',
         }}
       >
         {/* Top Bar */}
@@ -64,9 +65,11 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
           sidebarCollapsed={sidebarCollapsed}
         />
 
-        {/* Page Content */}
-        <Box sx={{ mt: '94px' }}>
-          <Outlet />
+        {/* Page Content - add responsive inner container to center content and control max width */}
+        <Box sx={{ mt: '94px', px: { xs: 1, sm: 2, md: 3 }, pb: { xs: 6, md: 3 } }}>
+          <Box sx={{ width: '100%' }}>
+            <Outlet />
+          </Box>
         </Box>
       </Box>
     </Box>
