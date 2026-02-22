@@ -71,7 +71,7 @@ export function NavigationItem({ item, isActive, collapsed, onClick }) {
               width: DIMENSIONS.item.iconSize,
               height: DIMENSIONS.item.iconSize,
               filter: isActive 
-                ? 'invert(45%) sepia(98%) saturate(1795%) hue-rotate(187deg) brightness(95%) contrast(95%)' 
+                ? 'invert(45%) sepia(98%) saturate(1795%) hue-rotate(187deg) brightness(95%) contrast(95%)'
                 : 'brightness(0) saturate(100%) invert(50%) sepia(0%)',
               opacity: isActive ? 1 : 0.7,
             }}
@@ -79,19 +79,20 @@ export function NavigationItem({ item, isActive, collapsed, onClick }) {
         </ListItemIcon>
         
         {!collapsed && (
-          <ListItemText
-            primary={item.label}
-            primaryTypographyProps={{
+          <Typography
+            sx={{
               ...TYPOGRAPHY.navItem,
               whiteSpace: 'nowrap',
               ...(isActive && {
-                background: GRADIENTS.primary,
+                background: 'linear-gradient(180deg, #1B85E9 0%, #88C7FC 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }),
             }}
-          />
+          >
+            {item.label}
+          </Typography>
         )}
       </ListItemButton>
     </ListItem>
@@ -123,7 +124,7 @@ export function SettingsItem({ item, isActive, collapsed, onClick, onToggleColla
               width: DIMENSIONS.item.iconSize,
               height: DIMENSIONS.item.iconSize,
               filter: isActive 
-                ? 'invert(45%) sepia(98%) saturate(1795%) hue-rotate(187deg) brightness(95%) contrast(95%)' 
+                ? 'invert(45%) sepia(98%) saturate(1795%) hue-rotate(187deg) brightness(95%) contrast(95%)'
                 : 'brightness(0) saturate(100%) invert(50%) sepia(0%)',
               opacity: isActive ? 1 : 0.7,
             }}
@@ -132,19 +133,20 @@ export function SettingsItem({ item, isActive, collapsed, onClick, onToggleColla
         
         {!collapsed && (
           <>
-            <ListItemText
-              primary={item.label}
-              primaryTypographyProps={{
+            <Typography
+              sx={{
                 ...TYPOGRAPHY.navItem,
                 whiteSpace: 'nowrap',
                 ...(isActive && {
-                  background: GRADIENTS.primary,
+                  background: 'linear-gradient(180deg, #1B85E9 0%, #88C7FC 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                 }),
               }}
-            />
+            >
+              {item.label}
+            </Typography>
             
             <Box
               component="img"

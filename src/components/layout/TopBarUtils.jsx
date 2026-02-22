@@ -10,7 +10,15 @@ import { DIMENSIONS, TYPOGRAPHY } from './styles/topBarStyles';
 // Theme Toggle Component
 export function ThemeToggle({ isDarkMode, onToggle }) {
   return (
-    <IconButton onClick={onToggle} sx={{ color: 'text.primary', borderRadius: 2, '&:hover': { bgcolor: 'action.hover' } }}>
+    <IconButton
+      onClick={onToggle}
+      sx={{
+        color: 'text.primary',
+        borderRadius: 2,
+        '&:hover': { bgcolor: 'action.hover' },
+        '&:focus': { outline: 'none' }
+      }}
+    >
       {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
     </IconButton>
   );

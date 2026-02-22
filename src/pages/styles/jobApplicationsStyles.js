@@ -3,50 +3,57 @@ import { TYPOGRAPHY as TOP_TYPO } from '../../components/layout/styles/topBarSty
 
 // Status color scheme matching Figma (adjusted for dark mode)
 export const STATUS_COLORS = {
-  Wishlist: { header: '#818CF8', headerBg: 'rgba(129,143,248,0.12)', cardBg: 'rgba(129,143,248,0.08)', border: '#818CF8' },
-  Applied: { header: '#F87171', headerBg: 'rgba(248,113,113,0.12)', cardBg: 'rgba(248,113,113,0.08)', border: '#F87171' },
-  Interviewing: { header: '#FBBF24', headerBg: 'rgba(251,191,36,0.12)', cardBg: 'rgba(251,191,36,0.08)', border: '#FBBF24' },
-  Offer: { header: '#34D399', headerBg: 'rgba(52,211,153,0.12)', cardBg: 'rgba(52,211,153,0.08)', border: '#34D399' },
-  Rejected: { header: '#9CA3AF', headerBg: 'rgba(156,163,175,0.12)', cardBg: 'rgba(156,163,175,0.08)', border: '#9CA3AF' },
+  Wishlist: { header: '#7950F2', headerBg: 'rgba(129,143,248,0.12)', cardBg: 'transparent', border: '#818CF8' },
+  Applied: { header: '#FA5252', headerBg: 'rgba(248,113,113,0.12)', cardBg: 'transparent', border: '#F87171' },
+  Interviewing: { header: '#FAB005', headerBg: 'rgba(251,191,36,0.12)', cardBg: 'transparent', border: '#FBBF24' },
+  Offer: { header: '#22E656', headerBg: 'rgba(52,211,153,0.12)', cardBg: 'transparent', border: '#34D399' },
+  Rejected: { header: '#9CA3AF', headerBg: 'rgba(156,163,175,0.12)', cardBg: 'transparent', border: '#9CA3AF' },
+};
+
+// Empty state gradients for each status
+export const EMPTY_STATE_GRADIENTS = {
+  Wishlist: 'linear-gradient(135deg, rgba(121, 80, 242, 0.05) 0%, rgba(129, 143, 248, 0.15) 100%)',
+  Applied: 'linear-gradient(135deg, rgba(250, 82, 82, 0.05) 0%, rgba(248, 113, 113, 0.15) 100%)',
+  Interviewing: 'linear-gradient(135deg, rgba(250, 176, 5, 0.05) 0%, rgba(251, 191, 36, 0.15) 100%)',
+  Offer: 'linear-gradient(135deg, rgba(34, 230, 86, 0.05) 0%, rgba(52, 211, 153, 0.15) 100%)',
+  Rejected: 'linear-gradient(135deg, rgba(156, 163, 175, 0.05) 0%, rgba(156, 163, 175, 0.15) 100%)',
 };
 
 export const BOARD = {
   container: {
     width: '100%',
-    p: { xs: 2, sm: 3 },
+    p: 0,
     maxWidth: '100%',
     overflow: 'hidden',
-    bgcolor: 'background.default',
+    bgcolor: 'background.paper',
   },
   // columns wrapper is column on mobile (stacked), row with horizontal scroll on md+
   columnsWrapper: {
     display: 'flex',
-    gap: 3,
+    gap: 1,
     alignItems: 'flex-start',
     overflowX: 'auto',
     pb: 2,
     width: '100%',
     flexDirection: { xs: 'column', md: 'row' },
-    // subtle padding so columns don't touch the edge
-    px: { xs: 1, md: 2 },
+    px: 0,
     // smooth scrolling feel
     WebkitOverflowScrolling: 'touch',
   },
   columnPaper: {
     // On mobile columns should be full-width and stacked; on desktop use fixed column width
-    width: { xs: '100%', md: 340 },
-    minWidth: { md: 280 },
-    maxWidth: { md: 360 },
+    width: { xs: '100%', md: 367 },
+    minWidth: { md: 320 },
+    maxWidth: { md: 400 },
     p: 2,
-    flex: { xs: '0 0 auto', md: '0 0 340px' },
+    flex: { xs: '0 0 auto', md: '0 0 367px' },
     bgcolor: 'background.paper',
     borderRadius: 2,
-    border: '1px solid',
-    borderColor: 'divider',
-    boxShadow: '0 6px 18px rgba(17,24,39,0.06)',
+    border: 'none',
+    boxShadow: 'none',
     // gentle lift on hover (desktop)
     '&:hover': {
-      boxShadow: '0 8px 24px rgba(2,6,23,0.24)',
+      boxShadow: 'none',
       transform: 'none',
     },
     transition: 'box-shadow 0.18s ease, transform 0.18s ease',
@@ -97,7 +104,8 @@ export const BOARD = {
     flexDirection: 'column',
     gap: 2,
     minHeight: 48,
-    p: 1,
+    p: 0,
+    mt: 2,
     transition: 'background-color 0.12s ease-in-out',
   },
   // visual style when a draggable is over the column
@@ -107,5 +115,141 @@ export const BOARD = {
     p: 1,
     border: '2px dashed',
     borderColor: 'var(--header-color, #d6e3ff)',
+  },
+  // Generic status header styles
+  statusHeader: {
+    width: 335,
+    height: 44,
+    opacity: 1,
+    borderRadius: '8px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderBottom: 'none',
+    backgroundColor: 'transparent',
+    margin: '0 auto', // Center the header
+  },
+  // Base styles for all status icons
+  baseStatusIcon: {
+    position: 'absolute',
+    opacity: 1,
+    filter: 'brightness(0) saturate(100%)',
+  },
+  // Base styles for all plus icons
+  basePlusIcon: {
+    position: 'absolute',
+    top: '10px',
+    left: '296px',
+    width: 18,
+    height: 18,
+    opacity: 1,
+    filter: 'brightness(0) saturate(100%)',
+  },
+  // Individual icon unique properties only
+  wishlistIcon: {
+    top: '25%',
+    left: '5.6%',
+    width: 23,
+    height: 23,
+    filter: 'brightness(0) saturate(100%) invert(20%) sepia(69%) saturate(3151%) hue-rotate(243deg) brightness(98%) contrast(97%)',
+  },
+  appliedIcon: {
+    top: '26%',
+    left: '5.6%',
+    width: 20,
+    height: 22,
+    filter: 'brightness(0) saturate(100%) invert(65%) sepia(52%) saturate(6142%) hue-rotate(338deg) brightness(102%) contrast(96%)',
+  },
+  interviewingIcon: {
+    top: '28%',
+    left: '5.6%',
+    width: 22,
+    height: 20,
+    filter: 'brightness(0) saturate(100%) invert(66%) sepia(63%) saturate(1425%) hue-rotate(10deg) brightness(104%) contrast(98%)',
+  },
+  offerIcon: {
+    top: '22%',
+    left: '5.6%',
+    width: 25,
+    height: 25,
+    filter: 'brightness(0) saturate(100%) invert(58%) sepia(60%) saturate(402%) hue-rotate(78deg) brightness(119%) contrast(89%)',
+  },
+  rejectedIcon: {
+    top: '28%',
+    left: '3.6%',
+    width: 20,
+    height: 20,
+    filter: 'brightness(0) saturate(100%) invert(67%) sepia(7%) saturate(928%) hue-rotate(169deg) brightness(96%) contrast(88%)',
+  },
+  statusTitle: {
+    position: 'absolute',
+    top: '4px',
+    left: '59px',
+    width: 117,
+    height: 37,
+    fontFamily: '"Space Grotesk", sans-serif',
+    fontWeight: 500,
+    fontSize: '20px',
+    lineHeight: '100%',
+    letterSpacing: '0%',
+    ml: 0,
+  },
+  statusActionIcon: {
+    position: 'absolute',
+    top: '10px',
+    left: '296px',
+    width: 24,
+    height: 24,
+    opacity: 1,
+  },
+  // Plus icon unique properties only (colors)
+  wishlistPlusIcon: {
+    filter: 'brightness(0) saturate(100%) invert(20%) sepia(69%) saturate(3151%) hue-rotate(243deg) brightness(98%) contrast(97%)',
+  },
+  appliedPlusIcon: {
+    filter: 'brightness(0) saturate(100%) invert(65%) sepia(52%) saturate(6142%) hue-rotate(338deg) brightness(102%) contrast(96%)',
+  },
+  interviewingPlusIcon: {
+    filter: 'brightness(0) saturate(100%) invert(66%) sepia(63%) saturate(1425%) hue-rotate(10deg) brightness(104%) contrast(98%)',
+  },
+  offerPlusIcon: {
+    filter: 'brightness(0) saturate(100%) invert(58%) sepia(60%) saturate(402%) hue-rotate(78deg) brightness(119%) contrast(89%)',
+  },
+  rejectedPlusIcon: {
+    filter: 'brightness(0) saturate(100%) invert(67%) sepia(7%) saturate(928%) hue-rotate(169deg) brightness(96%) contrast(88%)',
+  },
+  // Empty State Card Styles
+  emptyStateCard: {
+    width: 335,
+    height: 196,
+    opacity: 1,
+    borderRadius: '10px',
+    border: '1px dashed',
+    borderColor: 'var(--header-color, transparent)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '16px',
+    padding: '35px 24px',
+    background: 'var(--empty-state-bg, transparent)',
+    cursor: 'default',
+    userSelect: 'none',
+    pointerEvents: 'none',
+  },
+  emptyStateIcon: {
+    width: 66,
+    height: 66,
+    opacity: 1,
+  },
+  emptyStateText: {
+    width: 267,
+    height: 23,
+    fontFamily: 'Space Grotesk',
+    fontWeight: 500,
+    fontSize: '18px',
+    lineHeight: '100%',
+    letterSpacing: '0%',
+    textAlign: 'center',
+    opacity: 1,
   },
 };
