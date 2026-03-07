@@ -4,11 +4,14 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Card, CardContent, Avatar, Chip, Button, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Card, CardContent, Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
 import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
+import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
 
-export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef }) {
+export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef, onDelete }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
@@ -32,6 +35,29 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
       e.stopPropagation();
     }
     setDropdownOpen(false);
+  };
+
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeleteModalOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const handleDeleteConfirm = async (applicationId) => {
+    setIsDeleting(true);
+    try {
+      if (onDelete) {
+        await onDelete(applicationId);
+      }
+    } finally {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
   };
 
   return (
@@ -101,7 +127,18 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
               <Typography sx={CARD.menuItemText}>Move To...</Typography>
             </Box>
             
-            <Box sx={CARD.menuItem}>
+            <Box
+              sx={CARD.menuItem}
+              onClick={handleDeleteClick}
+              component="button"
+              style={{
+                cursor: 'pointer',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                opacity: 1,
+              }}
+            >
               <Box
                 component="img"
                 src="/src/assets/card application icons/delete.svg"
@@ -112,6 +149,15 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             </Box>
           </Box>
         )}
+
+        {/* Delete Modal */}
+        <DeleteApplicationModal
+          open={deleteModalOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          application={app}
+          isLoading={isDeleting}
+        />
 
         <CardContent sx={CARD.content}>
           <Stack direction="row" sx={CARD.chipRow}>
