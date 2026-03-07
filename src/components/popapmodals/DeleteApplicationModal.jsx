@@ -21,7 +21,6 @@ import { DELETE_MODAL } from './styles/deleteModalStyles';
 
 const DeleteApplicationModal = ({ open, onClose, onConfirm, application, isLoading = false }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleConfirm = () => {
     if (onConfirm) {
@@ -81,7 +80,6 @@ const DeleteApplicationModal = ({ open, onClose, onConfirm, application, isLoadi
         <Button
           onClick={handleConfirm}
           disabled={isLoading}
-          loading={isLoading}
           sx={DELETE_MODAL.buttonDelete}
           variant="contained"
         >

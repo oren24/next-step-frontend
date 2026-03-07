@@ -239,7 +239,7 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
                 placeholder="Add tag"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                 disabled={formData.tags.length >= 5}
                 sx={{ flex: 1 }}
               />
@@ -361,7 +361,6 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
         <Button
           onClick={handleSave}
           disabled={!isFormValid || isLoading}
-          loading={isLoading}
           sx={ADD_MODAL.buttonSave}
           variant="contained"
         >

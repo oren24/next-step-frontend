@@ -29,7 +29,6 @@ const WORK_TYPES = ['Remote', 'On site', 'Hybrid'];
 const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
 const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = false }) => {
-  const theme = useTheme();
   const [formData, setFormData] = useState({
     companyName: '',
     jobTitle: '',
@@ -51,7 +50,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
 
   useEffect(() => {
     if (application && open) {
-      setFormData({
+      const newFormData = {
         companyName: application.companyName || '',
         jobTitle: application.jobTitle || '',
         location: application.location || '',
@@ -67,10 +66,11 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
         answerDeadline: application.answerDeadline ? application.answerDeadline.split('T')[0] : '',
         offerAmount: application.offerAmount || '',
         offerCurrency: application.offerCurrency || 'USD',
-      });
+      };
+      setFormData(newFormData);
       setTagInput('');
     }
-  }, [application, open]);
+  }, [application?.id, open]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -243,7 +243,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
                 placeholder="Add tag"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                 disabled={formData.tags.length >= 5}
                 sx={{ flex: 1 }}
               />
@@ -365,7 +365,6 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
         <Button
           onClick={handleSave}
           disabled={isLoading}
-          loading={isLoading}
           sx={EDIT_MODAL.buttonSave}
           variant="contained"
         >
