@@ -80,15 +80,7 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
       
       <Card
         variant="outlined"
-        sx={{
-          ...cardStyle,
-          ...(dropdownOpen ? {
-            '&:hover': {
-              transform: 'none',
-              boxShadow: cardStyle.boxShadow
-            }
-          } : {})
-        }}
+        sx={cardStyle}
         ref={innerRef}
         {...(dropdownOpen ? {} : draggableProps)}
         {...(dropdownOpen ? {} : dragHandleProps)}
@@ -119,7 +111,22 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
           />
         </Box>
 
-        {/* Dropdown menu */}
+        {/* Dropdown menu - in separate container to avoid card hover */}
+        {!dropdownOpen && (
+          <CardContent sx={CARD.content}>
+            <Stack direction="row" sx={CARD.chipRow}>
+              {(app.tags || []).slice(0, 5).map((t) => (
+                <Chip key={t} label={t} size="small" sx={CARD.tag} />
+              ))}
+            </Stack>
+            <Box sx={CARD.metaRow}>
+              <Typography variant="caption" sx={CARD.metaText}>{app.platform || ''}</Typography>
+              <Typography variant="caption" sx={CARD.metaText}>{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ''}</Typography>
+            </Box>
+          </CardContent>
+        )}
+
+        {/* Dropdown menu overlay - positioned absolutely within card */}
         {dropdownOpen && (
           <Box sx={CARD.dropdownMenu}>
             <Box sx={CARD.menuItem}>
@@ -162,28 +169,16 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             </Box>
           </Box>
         )}
-
-        {/* Delete Modal */}
-        <DeleteApplicationModal
-          open={deleteModalOpen}
-          onClose={handleDeleteCancel}
-          onConfirm={handleDeleteConfirm}
-          application={app}
-          isLoading={isDeleting}
-        />
-
-        <CardContent sx={CARD.content}>
-          <Stack direction="row" sx={CARD.chipRow}>
-            {(app.tags || []).slice(0, 5).map((t) => (
-              <Chip key={t} label={t} size="small" sx={CARD.tag} />
-            ))}
-          </Stack>
-          <Box sx={CARD.metaRow}>
-            <Typography variant="caption" sx={CARD.metaText}>{app.platform || ''}</Typography>
-            <Typography variant="caption" sx={CARD.metaText}>{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ''}</Typography>
-          </Box>
-        </CardContent>
       </Card>
+
+      {/* Delete Modal */}
+      <DeleteApplicationModal
+        open={deleteModalOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        application={app}
+        isLoading={isDeleting}
+      />
     </>
   );
 }
