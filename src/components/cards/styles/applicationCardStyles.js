@@ -117,15 +117,28 @@ export const CARD = {
     opacity: 1,
     border: '1px solid',
     borderColor: 'divider',
+    pointerEvents: 'auto',
   },
   // Menu items
   menuItem: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    cursor: 'default',
     padding: '4px 0',
     opacity: 0.7,
+  },
+  // Interactive menu items (for buttons)
+  interactiveMenuItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    cursor: 'pointer',
+    padding: '4px 0',
+    opacity: 0.7,
+    transition: 'opacity 0.2s ease-in-out',
+    '&:hover': {
+      opacity: 1,
+    }
   },
   menuItemText: {
     fontFamily: 'Inter',
