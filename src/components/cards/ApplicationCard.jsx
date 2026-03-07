@@ -72,12 +72,27 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             right: 0,
             bottom: 0,
             zIndex: 999,
+            pointerEvents: 'auto',
           }}
           onClick={(e) => handleMenuClose(e)}
         />
       )}
       
-      <Card variant="outlined" sx={cardStyle} ref={innerRef} {...(dropdownOpen ? {} : draggableProps)} {...(dropdownOpen ? {} : dragHandleProps)}>
+      <Card
+        variant="outlined"
+        sx={{
+          ...cardStyle,
+          ...(dropdownOpen ? {
+            '&:hover': {
+              transform: 'none',
+              boxShadow: cardStyle.boxShadow
+            }
+          } : {})
+        }}
+        ref={innerRef}
+        {...(dropdownOpen ? {} : draggableProps)}
+        {...(dropdownOpen ? {} : dragHandleProps)}
+      >
         {/* Custom header with absolute positioning */}
         <Box sx={CARD.header}>
           <Avatar src={app.companyLogo} alt={app.companyName} sx={CARD.avatar} />

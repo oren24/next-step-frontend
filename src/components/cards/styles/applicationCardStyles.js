@@ -117,6 +117,7 @@ export const CARD = {
     opacity: 1,
     border: '1px solid',
     borderColor: 'divider',
+    pointerEvents: 'auto',
   },
   // Menu items
   menuItem: {
