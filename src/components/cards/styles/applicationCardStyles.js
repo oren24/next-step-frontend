@@ -123,7 +123,7 @@ export const CARD = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    cursor: 'default',
+    cursor: 'pointer',
     padding: '4px 0',
     opacity: 0.7,
     transition: 'opacity 0.2s ease-in-out',
