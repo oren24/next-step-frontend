@@ -128,7 +128,7 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             </Box>
             
             <Box
-              sx={CARD.menuItem}
+              sx={CARD.interactiveMenuItem}
               onClick={handleDeleteClick}
               component="button"
               style={{

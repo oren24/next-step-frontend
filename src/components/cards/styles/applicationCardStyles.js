@@ -123,6 +123,14 @@ export const CARD = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+    padding: '4px 0',
+    opacity: 0.7,
+  },
+  // Interactive menu items (for buttons)
+  interactiveMenuItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
     cursor: 'pointer',
     padding: '4px 0',
     opacity: 0.7,
