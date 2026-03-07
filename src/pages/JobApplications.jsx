@@ -6,6 +6,7 @@ import {rectSortingStrategy, SortableContext} from '@dnd-kit/sortable';
 import {PointerSensor, TouchSensor} from '@dnd-kit/core';
 import DraggableItem from '../components/cards/DraggableItem.jsx';
 import ApplicationCard from '../components/cards/ApplicationCard.jsx';
+import AddApplicationModal from '../components/popapmodals/AddApplicationModal.jsx';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
 import {BOARD, STATUS_COLORS, EMPTY_STATE_GRADIENTS} from './styles/jobApplicationsStyles';
 
@@ -22,7 +23,8 @@ const buildColumns = (apps) => {
 };
 
 // Column component moved out of JobApplications for lint rules
-const Column = ({status, appsInColumn = [], updateAppStatus, onDelete}) => {
+const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onAdd}) => {
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const {isOver, setNodeRef} = useDroppable({id: status});
   const colors = STATUS_COLORS[status] || STATUS_COLORS.Wishlist;
 
@@ -88,13 +90,33 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete}) => {
           {status === 'Wishlist' ? 'Wishlist' : status}
         </Typography>
         <Box
-          component="img"
-          src="/src/assets/main section icons/plus.svg"
+          component="button"
+          onClick={() => setAddModalOpen(true)}
           sx={{
             ...BOARD.basePlusIcon,
             ...plusIconStyles[status],
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            '&:hover': {
+              opacity: 0.8,
+            }
           }}
-        />
+        >
+          <Box
+            component="img"
+            src="/src/assets/main section icons/plus.svg"
+            sx={{
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+            }}
+          />
+        </Box>
       </Box>
 
       <SortableContext items={appsInColumn.map((a) => a.id)} strategy={rectSortingStrategy}>
@@ -156,6 +178,7 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete}) => {
                     return null;
                   }}
                   onDelete={onDelete}
+                  onEdit={onEdit}
                   isFirst={status === STATUS_ORDER[0]}
                   isLast={status === STATUS_ORDER.at(-1)}
                 />
@@ -164,6 +187,17 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete}) => {
           )}
         </Stack>
       </SortableContext>
+
+      {/* Add Application Modal */}
+      <AddApplicationModal
+        open={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        onSave={(newApp) => {
+          onAdd(newApp);
+          setAddModalOpen(false);
+        }}
+        status={status}
+      />
     </Paper>
   );
 };
@@ -195,6 +229,23 @@ export default function JobApplications() {
 
   const handleDeleteApplication = (appId) => {
     setApps((prev) => prev.filter((app) => app.id !== appId));
+  };
+
+  const handleAddApplication = (newApp) => {
+    setApps((prev) => [...prev, newApp]);
+  };
+
+  const handleEditApplication = (updatedApp) => {
+    setApps((prev) => {
+      const copy = prev.map((p) => ({...p}));
+      const idx = copy.findIndex((c) => c.id === updatedApp.id);
+      if (idx === -1) return prev;
+      copy[idx] = {
+        ...updatedApp,
+        updatedAt: new Date().toISOString(),
+      };
+      return copy;
+    });
   };
 
   // Handle drag end to support moving between columns and reordering within columns
@@ -266,7 +317,7 @@ export default function JobApplications() {
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={BOARD.columnsWrapper}>
             {STATUS_ORDER.map((status) => (
-              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication}/>
+              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onAdd={handleAddApplication}/>
             ))}
           </Box>
 

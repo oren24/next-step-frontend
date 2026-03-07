@@ -7,11 +7,14 @@ import React, { useState } from 'react';
 import { Box, Card, CardContent, Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
 import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
 import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
+import EditApplicationModal from '../popapmodals/EditApplicationModal';
 
-export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef, onDelete }) {
+export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef, onDelete, onEdit }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
@@ -58,6 +61,29 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
 
   const handleDeleteCancel = () => {
     setDeleteModalOpen(false);
+  };
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditModalOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const handleEditCancel = () => {
+    setEditModalOpen(false);
+  };
+
+  const handleEditSave = async (updatedApp) => {
+    setIsEditing(true);
+    try {
+      if (onEdit) {
+        await onEdit(updatedApp);
+      }
+    } finally {
+      setIsEditing(false);
+      setEditModalOpen(false);
+    }
   };
 
   return (
@@ -120,7 +146,16 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
         {/* Dropdown menu */}
         {dropdownOpen && (
           <Box sx={CARD.dropdownMenu}>
-            <Box sx={CARD.menuItem}>
+            <Box
+              sx={CARD.interactiveMenuItem}
+              onClick={handleEditClick}
+              component="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+              }}
+            >
               <Box
                 component="img"
                 src="/src/assets/card application icons/edit.svg"
@@ -168,6 +203,15 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
           onConfirm={handleDeleteConfirm}
           application={app}
           isLoading={isDeleting}
+        />
+
+        {/* Edit Modal */}
+        <EditApplicationModal
+          open={editModalOpen}
+          onClose={handleEditCancel}
+          onSave={handleEditSave}
+          application={app}
+          isLoading={isEditing}
         />
 
         <CardContent sx={CARD.content}>
