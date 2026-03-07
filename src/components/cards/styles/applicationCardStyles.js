@@ -26,13 +26,14 @@ export const CARD = {
     borderRadius: '10px',
     position: 'relative',
     overflow: 'visible',
-    transition: 'box-shadow 0.14s ease-in-out',
+    transition: 'box-shadow 0.14s ease-in-out, transform 0.14s ease-in-out',
     bgcolor: 'background.paper',
     border: '1px solid',
     borderColor: 'divider',
     boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
     opacity: 1,
     '&:hover': {
+      transform: 'translateY(-4px)',
       boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
     }
   },
@@ -44,12 +45,13 @@ export const CARD = {
     borderRadius: '10px',
     position: 'relative',
     overflow: 'visible',
-    transition: 'box-shadow 0.14s ease-in-out',
+    transition: 'box-shadow 0.14s ease-in-out, transform 0.14s ease-in-out',
     border: '1px solid',
     borderColor: 'divider',
     boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
     opacity: 1,
     '&:hover': {
+      transform: 'translateY(-4px)',
       boxShadow: '0 12px 28px rgba(0,0,0,0.12)',
     }
   },
