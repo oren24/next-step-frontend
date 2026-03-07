@@ -80,7 +80,13 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
       
       <Card
         variant="outlined"
-        sx={cardStyle}
+        sx={dropdownOpen ? {
+          ...cardStyle,
+          '&:hover': {
+            boxShadow: cardStyle.boxShadow || '0 4px 12px rgba(0,0,0,0.08)',
+            transform: 'none',
+          }
+        } : cardStyle}
         ref={innerRef}
         {...(dropdownOpen ? {} : draggableProps)}
         {...(dropdownOpen ? {} : dragHandleProps)}
@@ -111,22 +117,7 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
           />
         </Box>
 
-        {/* Dropdown menu - in separate container to avoid card hover */}
-        {!dropdownOpen && (
-          <CardContent sx={CARD.content}>
-            <Stack direction="row" sx={CARD.chipRow}>
-              {(app.tags || []).slice(0, 5).map((t) => (
-                <Chip key={t} label={t} size="small" sx={CARD.tag} />
-              ))}
-            </Stack>
-            <Box sx={CARD.metaRow}>
-              <Typography variant="caption" sx={CARD.metaText}>{app.platform || ''}</Typography>
-              <Typography variant="caption" sx={CARD.metaText}>{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ''}</Typography>
-            </Box>
-          </CardContent>
-        )}
-
-        {/* Dropdown menu overlay - positioned absolutely within card */}
+        {/* Dropdown menu */}
         {dropdownOpen && (
           <Box sx={CARD.dropdownMenu}>
             <Box sx={CARD.menuItem}>
@@ -169,16 +160,28 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             </Box>
           </Box>
         )}
-      </Card>
 
-      {/* Delete Modal */}
-      <DeleteApplicationModal
-        open={deleteModalOpen}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        application={app}
-        isLoading={isDeleting}
-      />
+        {/* Delete Modal */}
+        <DeleteApplicationModal
+          open={deleteModalOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          application={app}
+          isLoading={isDeleting}
+        />
+
+        <CardContent sx={CARD.content}>
+          <Stack direction="row" sx={CARD.chipRow}>
+            {(app.tags || []).slice(0, 5).map((t) => (
+              <Chip key={t} label={t} size="small" sx={CARD.tag} />
+            ))}
+          </Stack>
+          <Box sx={CARD.metaRow}>
+            <Typography variant="caption" sx={CARD.metaText}>{app.platform || ''}</Typography>
+            <Typography variant="caption" sx={CARD.metaText}>{app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ''}</Typography>
+          </Box>
+        </CardContent>
+      </Card>
     </>
   );
 }
