@@ -4,9 +4,9 @@ import ApplicationCard from './ApplicationCard.jsx';
 
 /**
  * DraggableItem wraps an ApplicationCard with dnd-kit sortable behavior
- * @param {{app: import('../../../types/Types.js').JobApplication, leftStatus?: string, rightStatus?: string, updateAppStatus: function, isFirst?: boolean, isLast?: boolean}} props
+ * @param {{app: import('../../../types/Types.js').JobApplication, leftStatus?: string, rightStatus?: string, updateAppStatus: function, onDelete?: function, isFirst?: boolean, isLast?: boolean}} props
  */
-export default function DraggableItem({ app, leftStatus, rightStatus, updateAppStatus, isFirst = false, isLast = false }) {
+export default function DraggableItem({ app, leftStatus, rightStatus, updateAppStatus, onDelete, isFirst = false, isLast = false }) {
   const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({id: app.id});
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
@@ -23,6 +23,7 @@ export default function DraggableItem({ app, leftStatus, rightStatus, updateAppS
         status={app.status}
         onMoveLeft={(id) => updateAppStatus(id, leftStatus)}
         onMoveRight={(id) => updateAppStatus(id, rightStatus)}
+        onDelete={onDelete}
         isFirst={isFirst}
         isLast={isLast}
       />

@@ -22,7 +22,7 @@ const buildColumns = (apps) => {
 };
 
 // Column component moved out of JobApplications for lint rules
-const Column = ({status, appsInColumn = [], updateAppStatus}) => {
+const Column = ({status, appsInColumn = [], updateAppStatus, onDelete}) => {
   const {isOver, setNodeRef} = useDroppable({id: status});
   const colors = STATUS_COLORS[status] || STATUS_COLORS.Wishlist;
 
@@ -155,6 +155,7 @@ const Column = ({status, appsInColumn = [], updateAppStatus}) => {
                     if (toStatus) return updateAppStatus(id, toStatus);
                     return null;
                   }}
+                  onDelete={onDelete}
                   isFirst={status === STATUS_ORDER[0]}
                   isLast={status === STATUS_ORDER.at(-1)}
                 />
@@ -190,6 +191,10 @@ export default function JobApplications() {
       copy[idx].updatedAt = new Date().toISOString();
       return copy;
     });
+  };
+
+  const handleDeleteApplication = (appId) => {
+    setApps((prev) => prev.filter((app) => app.id !== appId));
   };
 
   // Handle drag end to support moving between columns and reordering within columns
@@ -261,7 +266,7 @@ export default function JobApplications() {
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={BOARD.columnsWrapper}>
             {STATUS_ORDER.map((status) => (
-              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus}/>
+              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication}/>
             ))}
           </Box>
 
