@@ -23,7 +23,7 @@ const buildColumns = (apps) => {
 };
 
 // Column component moved out of JobApplications for lint rules
-const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onAdd}) => {
+const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, onAdd}) => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const {isOver, setNodeRef} = useDroppable({id: status});
   const colors = STATUS_COLORS[status] || STATUS_COLORS.Wishlist;
@@ -317,7 +317,7 @@ export default function JobApplications() {
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={BOARD.columnsWrapper}>
             {STATUS_ORDER.map((status) => (
-              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onAdd={handleAddApplication}/>
+              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleEditApplication} onAdd={handleAddApplication}/>
             ))}
           </Box>
 
