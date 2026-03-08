@@ -4,11 +4,17 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Card, CardContent, Avatar, Chip, Button, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Card, CardContent, Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
 import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
+import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
+import EditApplicationModal from '../popapmodals/EditApplicationModal';
 
-export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef }) {
+export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef, onDelete, onEdit }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
@@ -34,6 +40,52 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
     setDropdownOpen(false);
   };
 
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDeleteModalOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const handleDeleteConfirm = async (applicationId) => {
+    setIsDeleting(true);
+    try {
+      if (onDelete) {
+        await onDelete(applicationId);
+      }
+    } finally {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModalOpen(false);
+  };
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditModalOpen(true);
+    setDropdownOpen(false);
+  };
+
+  const handleEditCancel = () => {
+    setEditModalOpen(false);
+  };
+
+  const handleEditSave = async (updatedApp) => {
+    setIsEditing(true);
+    try {
+      if (onEdit) {
+        await onEdit(updatedApp);
+      }
+    } finally {
+      setIsEditing(false);
+      setEditModalOpen(false);
+    }
+  };
+
   return (
     <>
       {/* Backdrop to close dropdown when clicking outside */}
@@ -46,12 +98,25 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             right: 0,
             bottom: 0,
             zIndex: 999,
+            pointerEvents: 'auto',
           }}
           onClick={(e) => handleMenuClose(e)}
         />
       )}
       
-      <Card variant="outlined" sx={cardStyle} ref={innerRef} {...(dropdownOpen ? {} : draggableProps)} {...(dropdownOpen ? {} : dragHandleProps)}>
+      <Card
+        variant="outlined"
+        sx={dropdownOpen ? {
+          ...cardStyle,
+          '&:hover': {
+            boxShadow: cardStyle.boxShadow || '0 4px 12px rgba(0,0,0,0.08)',
+            transform: 'none',
+          }
+        } : cardStyle}
+        ref={innerRef}
+        {...(dropdownOpen ? {} : draggableProps)}
+        {...(dropdownOpen ? {} : dragHandleProps)}
+      >
         {/* Custom header with absolute positioning */}
         <Box sx={CARD.header}>
           <Avatar src={app.companyLogo} alt={app.companyName} sx={CARD.avatar} />
@@ -81,7 +146,16 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
         {/* Dropdown menu */}
         {dropdownOpen && (
           <Box sx={CARD.dropdownMenu}>
-            <Box sx={CARD.menuItem}>
+            <Box
+              sx={CARD.interactiveMenuItem}
+              onClick={handleEditClick}
+              component="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+              }}
+            >
               <Box
                 component="img"
                 src="/src/assets/card application icons/edit.svg"
@@ -101,7 +175,16 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
               <Typography sx={CARD.menuItemText}>Move To...</Typography>
             </Box>
             
-            <Box sx={CARD.menuItem}>
+            <Box
+              sx={CARD.interactiveMenuItem}
+              onClick={handleDeleteClick}
+              component="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+              }}
+            >
               <Box
                 component="img"
                 src="/src/assets/card application icons/delete.svg"
@@ -112,6 +195,24 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
             </Box>
           </Box>
         )}
+
+        {/* Delete Modal */}
+        <DeleteApplicationModal
+          open={deleteModalOpen}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          application={app}
+          isLoading={isDeleting}
+        />
+
+        {/* Edit Modal */}
+        <EditApplicationModal
+          open={editModalOpen}
+          onClose={handleEditCancel}
+          onSave={handleEditSave}
+          application={app}
+          isLoading={isEditing}
+        />
 
         <CardContent sx={CARD.content}>
           <Stack direction="row" sx={CARD.chipRow}>
