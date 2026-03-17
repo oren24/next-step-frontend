@@ -4,7 +4,7 @@
  * @param {{open: boolean, onClose: function, onSave: function, status?: string, isLoading?: boolean}} props
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -27,38 +27,32 @@ import { ADD_MODAL } from './styles/addModalStyles';
 const WORK_TYPES = ['Remote', 'On site', 'Hybrid'];
 const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
+const createInitialFormData = (status) => ({
+  companyName: '',
+  jobTitle: '',
+  location: '',
+  workType: 'Remote',
+  status,
+  platform: '',
+  appliedDate: new Date().toISOString().split('T')[0],
+  notes: '',
+  tags: [],
+  jobUrl: '',
+  nextInterviewDate: '',
+  round: '',
+  answerDeadline: '',
+  offerAmount: '',
+  offerCurrency: 'USD',
+});
+
 const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoading = false }) => {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    jobTitle: '',
-    location: '',
-    workType: 'Remote',
-    status: status,
-    platform: '',
-    appliedDate: '',
-    notes: '',
-    tags: [],
-    jobUrl: '',
-    nextInterviewDate: '',
-    round: '',
-    answerDeadline: '',
-    offerAmount: '',
-    offerCurrency: 'USD',
-  });
+  const [formData, setFormData] = useState(() => createInitialFormData(status));
   const [tagInput, setTagInput] = useState('');
 
-  useEffect(() => {
-    if (open) {
-      // Get today's date in YYYY-MM-DD format
-      const today = new Date().toISOString().split('T')[0];
-      setFormData((prev) => ({
-        ...prev,
-        status: status,
-        appliedDate: today,
-      }));
-      setTagInput('');
-    }
-  }, [open, status]);
+  const handleDialogEnter = () => {
+    setFormData(createInitialFormData(status));
+    setTagInput('');
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,6 +100,7 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      TransitionProps={{ onEnter: handleDialogEnter }}
       PaperProps={{
         sx: {
           borderRadius: '12px',

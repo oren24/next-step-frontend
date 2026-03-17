@@ -13,14 +13,11 @@ import {
   DialogActions,
   Button,
   Box,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import { DELETE_MODAL } from './styles/deleteModalStyles';
 
 const DeleteApplicationModal = ({ open, onClose, onConfirm, application, isLoading = false }) => {
-  const theme = useTheme();
 
   const handleConfirm = () => {
     if (onConfirm) {

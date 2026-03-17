@@ -7,6 +7,7 @@ import DraggableItem from '../components/cards/DraggableItem.jsx';
 import ApplicationCard from '../components/cards/ApplicationCard.jsx';
 import AddApplicationModal from '../components/popapmodals/AddApplicationModal.jsx';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
+import ApplicationsListView from '../components/list/ApplicationsListView.jsx';
 import {BOARD, STATUS_COLORS, EMPTY_STATE_GRADIENTS} from './styles/jobApplicationsStyles';
 
 const STATUS_ORDER = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
@@ -216,16 +217,21 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, o
           {isEmpty ? (
             <EmptyStateCard status={status} colors={colors} iconStyle={iconStyle} statusIcon={statusIcon} />
           ) : (
-            appsInColumn.map((app) => (
-              <DraggableItemWrapper
-                key={app.id}
-                app={app}
-                status={status}
-                updateAppStatus={updateAppStatus}
-                onDelete={onDelete}
-                onEdit={onEdit}
-              />
-            ))
+            <>
+              {appsInColumn.map((app) => (
+                <DraggableItemWrapper
+                  key={app.id}
+                  app={app}
+                  status={status}
+                  updateAppStatus={updateAppStatus}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                />
+              ))}
+              {isOver && (
+                <Box sx={BOARD.dropHint}>↓ Drop here</Box>
+              )}
+            </>
           )}
         </Stack>
       </SortableContext>
@@ -341,19 +347,13 @@ export default function JobApplications() {
       <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} />
       
       {currentView === 'list' ? (
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            height: '400px',
-            fontSize: '24px',
-            fontWeight: 600,
-            color: 'text.primary'
-          }}
-        >
-          TBD
-        </Box>
+        <ApplicationsListView
+          apps={apps}
+          onAdd={handleAddApplication}
+          onEdit={handleEditApplication}
+          onDelete={handleDeleteApplication}
+          onStatusChange={updateAppStatus}
+        />
       ) : (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={BOARD.columnsWrapper}>

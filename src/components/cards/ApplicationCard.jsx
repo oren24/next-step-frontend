@@ -1,6 +1,6 @@
 /**
  * ApplicationCard component
- * @param {{app: import('../../../types/Types.js').JobApplication, onMoveLeft: function, onMoveRight: function, isFirst?: boolean, isLast?: boolean, draggableProps?: object, dragHandleProps?: object, innerRef?: any}} props
+ * @param {{app: import('../../../types/Types.js').JobApplication, status?: import('../../../types/Types.js').JobStatus, draggableProps?: object, dragHandleProps?: object, innerRef?: any, onDelete?: function, onEdit?: function}} props
  */
 
 import React, { useState } from 'react';
@@ -9,7 +9,7 @@ import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
 import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
 import EditApplicationModal from '../popapmodals/EditApplicationModal';
 
-export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, isFirst = false, isLast = false, draggableProps, dragHandleProps, innerRef, onDelete, onEdit }) {
+export default function ApplicationCard({ app, status, draggableProps, dragHandleProps, innerRef, onDelete, onEdit }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -18,11 +18,11 @@ export default function ApplicationCard({ app, status, onMoveLeft, onMoveRight, 
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
-  // Use gradient background if status is provided, otherwise use default
-  const cardStyle = status && STATUS_GRADIENTS[isDarkMode ? 'dark' : 'light'][status]
-    ? { 
-        ...CARD.rootWithGradient, 
-        background: STATUS_GRADIENTS[isDarkMode ? 'dark' : 'light'][status] 
+  const statusGradient = STATUS_GRADIENTS[isDarkMode ? 'dark' : 'light'][status];
+  const cardStyle = statusGradient
+    ? {
+        ...CARD.rootWithGradient,
+        background: statusGradient,
       }
     : CARD.root;
 
