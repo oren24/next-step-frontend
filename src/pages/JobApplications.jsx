@@ -344,8 +344,8 @@ export default function JobApplications() {
 
   return (
     <Box sx={BOARD.container}>
-      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} />
-      
+      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} applications={apps} />
+
       {currentView === 'list' ? (
         <ApplicationsListView
           apps={apps}

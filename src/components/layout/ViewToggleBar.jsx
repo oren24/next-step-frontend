@@ -1,9 +1,14 @@
 import React from 'react';
 import { Box, Button, Typography, useTheme } from '@mui/material';
+import { exportApplicationsToCSV } from '../exporters/csvExporter.js';
 
-const ViewToggleBar = ({ currentView, onViewChange }) => {
+const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
   const theme = useTheme();
-  
+
+  const handleExport = () => {
+    exportApplicationsToCSV(applications);
+  };
+
   const buttonBaseStyle = {
     display: 'flex',
     alignItems: 'center',
@@ -152,7 +157,7 @@ const ViewToggleBar = ({ currentView, onViewChange }) => {
       </Box>
 
       {/* Right side - Export button */}
-      <Button sx={exportButtonStyle}>
+      <Button sx={exportButtonStyle} onClick={handleExport}>
         <Box
           component="img"
           src="/src/assets/main section icons/excel.svg"
