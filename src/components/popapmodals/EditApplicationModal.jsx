@@ -4,7 +4,7 @@
  * @param {{open: boolean, onClose: function, onSave: function, application?: import('../../types/Types.js').JobApplication, isLoading?: boolean}} props
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -20,7 +20,6 @@ import {
   MenuItem,
   Chip,
   Stack,
-  useTheme,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { EDIT_MODAL } from './styles/editModalStyles';
@@ -28,49 +27,32 @@ import { EDIT_MODAL } from './styles/editModalStyles';
 const WORK_TYPES = ['Remote', 'On site', 'Hybrid'];
 const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
+const createInitialFormData = (application) => ({
+  companyName: application?.companyName || '',
+  jobTitle: application?.jobTitle || '',
+  location: application?.location || '',
+  workType: application?.workType || 'Remote',
+  status: application?.status || 'Wishlist',
+  platform: application?.platform || '',
+  appliedDate: application?.appliedDate ? application.appliedDate.split('T')[0] : '',
+  notes: application?.notes || '',
+  tags: application?.tags || [],
+  jobUrl: application?.jobUrl || '',
+  nextInterviewDate: application?.nextInterviewDate ? application.nextInterviewDate.split('T')[0] : '',
+  round: application?.round || '',
+  answerDeadline: application?.answerDeadline ? application.answerDeadline.split('T')[0] : '',
+  offerAmount: application?.offerAmount || '',
+  offerCurrency: application?.offerCurrency || 'USD',
+});
+
 const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = false }) => {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    jobTitle: '',
-    location: '',
-    workType: 'Remote',
-    status: 'Wishlist',
-    platform: '',
-    appliedDate: '',
-    notes: '',
-    tags: [],
-    jobUrl: '',
-    nextInterviewDate: '',
-    round: '',
-    answerDeadline: '',
-    offerAmount: '',
-    offerCurrency: 'USD',
-  });
+  const [formData, setFormData] = useState(() => createInitialFormData(application));
   const [tagInput, setTagInput] = useState('');
 
-  useEffect(() => {
-    if (application && open) {
-      const newFormData = {
-        companyName: application.companyName || '',
-        jobTitle: application.jobTitle || '',
-        location: application.location || '',
-        workType: application.workType || 'Remote',
-        status: application.status || 'Wishlist',
-        platform: application.platform || '',
-        appliedDate: application.appliedDate ? application.appliedDate.split('T')[0] : '',
-        notes: application.notes || '',
-        tags: application.tags || [],
-        jobUrl: application.jobUrl || '',
-        nextInterviewDate: application.nextInterviewDate ? application.nextInterviewDate.split('T')[0] : '',
-        round: application.round || '',
-        answerDeadline: application.answerDeadline ? application.answerDeadline.split('T')[0] : '',
-        offerAmount: application.offerAmount || '',
-        offerCurrency: application.offerCurrency || 'USD',
-      };
-      setFormData(newFormData);
-      setTagInput('');
-    }
-  }, [application?.id, open]);
+  const handleDialogEnter = () => {
+    setFormData(createInitialFormData(application));
+    setTagInput('');
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,10 +72,17 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
     }
   };
 
-  const handleRemoveTag = (indexToRemove) => {
+  const handleRemoveTag = (tagToRemove) => {
+    let removed = false;
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((_, index) => index !== indexToRemove),
+      tags: prev.tags.filter((tag) => {
+        if (!removed && tag === tagToRemove) {
+          removed = true;
+          return false;
+        }
+        return true;
+      }),
     }));
   };
 
@@ -112,10 +101,13 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: '12px',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      slotProps={{
+        transition: { onEnter: handleDialogEnter },
+        paper: {
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+          },
         },
       }}
     >
@@ -166,6 +158,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
               <FormControl fullWidth size="small">
                 <InputLabel>Work Type</InputLabel>
                 <Select
+                  variant="outlined"
                   name="workType"
                   value={formData.workType}
                   onChange={handleInputChange}
@@ -183,6 +176,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
               <FormControl fullWidth size="small">
                 <InputLabel>Status</InputLabel>
                 <Select
+                  variant="outlined"
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
@@ -219,7 +213,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
                 value={formData.appliedDate}
                 onChange={handleInputChange}
                 size="small"
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -257,11 +251,11 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
             </Box>
             {formData.tags.length > 0 && (
               <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                {formData.tags.map((tag, index) => (
+                {formData.tags.map((tag) => (
                   <Chip
-                    key={index}
+                    key={tag}
                     label={tag}
-                    onDelete={() => handleRemoveTag(index)}
+                    onDelete={() => handleRemoveTag(tag)}
                     size="small"
                   />
                 ))}
@@ -290,7 +284,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
                 value={formData.nextInterviewDate}
                 onChange={handleInputChange}
                 size="small"
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
             <Grid item xs={12}>
@@ -302,7 +296,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
                 value={formData.answerDeadline}
                 onChange={handleInputChange}
                 size="small"
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
             </Grid>
           </Grid>
@@ -324,6 +318,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
               <FormControl fullWidth size="small">
                 <InputLabel>Currency</InputLabel>
                 <Select
+                  variant="outlined"
                   name="offerCurrency"
                   value={formData.offerCurrency}
                   onChange={handleInputChange}

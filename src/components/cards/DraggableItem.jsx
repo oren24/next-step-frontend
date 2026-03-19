@@ -24,6 +24,7 @@ export default function DraggableItem({ app, leftStatus, rightStatus, updateAppS
         onMoveLeft={(id) => updateAppStatus(id, leftStatus)}
         onMoveRight={(id) => updateAppStatus(id, rightStatus)}
         onDelete={onDelete}
+        onEdit={onEdit}
         isFirst={isFirst}
         isLast={isLast}
       />
