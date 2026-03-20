@@ -8,6 +8,7 @@ import ApplicationCard from '../components/cards/ApplicationCard.jsx';
 import AddApplicationModal from '../components/popapmodals/AddApplicationModal.jsx';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
 import ApplicationsListView from '../components/list/ApplicationsListView.jsx';
+import JobDrawer from '../components/drawer/JobDrawer.jsx';
 import {BOARD, STATUS_COLORS, EMPTY_STATE_GRADIENTS} from './styles/jobApplicationsStyles';
 
 const STATUS_ORDER = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
@@ -252,6 +253,8 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, o
 export default function JobApplications() {
   const [apps, setApps] = useState(() => mockApplications.map((a) => ({...a})));
   const [currentView, setCurrentView] = useState('kanban');
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const columns = useMemo(() => buildColumns(apps), [apps]);
 
@@ -268,8 +271,19 @@ export default function JobApplications() {
       const copy = prev.map((p) => ({...p}));
       const idx = copy.findIndex((c) => c.id === appId);
       if (idx === -1) return prev;
+      const oldStatus = copy[idx].status;
       copy[idx].status = newStatus;
       copy[idx].updatedAt = new Date().toISOString();
+
+      // Add to status history
+      if (!copy[idx].statusHistory) copy[idx].statusHistory = [];
+      if (oldStatus !== newStatus) {
+        copy[idx].statusHistory.push({
+          status: newStatus,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
       return copy;
     });
   };
@@ -282,17 +296,41 @@ export default function JobApplications() {
     setApps((prev) => [...prev, newApp]);
   };
 
-  const handleEditApplication = (updatedApp) => {
-    setApps((prev) => {
-      const copy = prev.map((p) => ({...p}));
-      const idx = copy.findIndex((c) => c.id === updatedApp.id);
-      if (idx === -1) return prev;
-      copy[idx] = {
-        ...updatedApp,
-        updatedAt: new Date().toISOString(),
-      };
-      return copy;
+  const handleOpenJobDrawer = (app) => {
+    if (!app) return;
+    setSelectedApp(app);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseJobDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
+  const handleSaveNote = (appId, note) => {
+    setApps((prev) => prev.map((item) => (item.id === appId ? {...item, note, updatedAt: new Date().toISOString()} : item)));
+    setSelectedApp((prev) => (prev && prev.id === appId ? {...prev, note, updatedAt: new Date().toISOString()} : prev));
+  };
+
+  const handleSaveInterviewStatus = (appId) => {
+    setApps((prev) => prev.map((item) => {
+      if (item.id !== appId) return item;
+      const updated = {...item, status: 'Interviewing', updatedAt: new Date().toISOString()};
+      if (!updated.statusHistory) updated.statusHistory = [];
+      updated.statusHistory.push({status: 'Interviewing', timestamp: new Date().toISOString()});
+      return updated;
+    }));
+    setSelectedApp((prev) => {
+      if (!prev || prev.id !== appId) return prev;
+      const updated = {...prev, status: 'Interviewing', updatedAt: new Date().toISOString()};
+      if (!updated.statusHistory) updated.statusHistory = [];
+      updated.statusHistory.push({status: 'Interviewing', timestamp: new Date().toISOString()});
+      return updated;
     });
+  };
+
+  const handleSaveEdit = (updatedApp) => {
+    setApps((prev) => prev.map((item) => (item.id === updatedApp.id ? {...updatedApp, updatedAt: new Date().toISOString()} : item)));
+    setIsDrawerOpen(false);
   };
 
   // Handle drag end to support moving between columns and reordering within columns
@@ -350,7 +388,7 @@ export default function JobApplications() {
         <ApplicationsListView
           apps={apps}
           onAdd={handleAddApplication}
-          onEdit={handleEditApplication}
+          onEdit={handleOpenJobDrawer}
           onDelete={handleDeleteApplication}
           onStatusChange={updateAppStatus}
         />
@@ -358,7 +396,7 @@ export default function JobApplications() {
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Box sx={BOARD.columnsWrapper}>
             {STATUS_ORDER.map((status) => (
-              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleEditApplication} onAdd={handleAddApplication}/>
+              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleOpenJobDrawer} onAdd={handleAddApplication}/>
             ))}
           </Box>
 
@@ -371,6 +409,15 @@ export default function JobApplications() {
           </DragOverlay>
         </DndContext>
       )}
+
+      <JobDrawer
+        open={isDrawerOpen}
+        app={selectedApp}
+        onClose={handleCloseJobDrawer}
+        onSaveNote={handleSaveNote}
+        onSaveInterviewStatus={handleSaveInterviewStatus}
+        onSaveEdit={handleSaveEdit}
+      />
     </Box>
   );
 }
