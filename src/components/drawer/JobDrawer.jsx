@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import PropTypes from 'prop-types';
 import {
   Box,
   Button,
@@ -16,6 +17,31 @@ import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import {
+  ctaButtonSx,
+  ctaWrapSx,
+  drawerPaperSx,
+  drawerRootSx,
+  headerRowSx,
+  historyEntrySx,
+  historyStatusSx,
+  historyTimeSx,
+  iconMetaSx,
+  labelSx,
+  linkSx,
+  logoSx,
+  metaTextSx,
+  notesInputSx,
+  notesLabelSx,
+  scrollSectionSx,
+  sectionSx,
+  sectionTitleSx,
+  statusChipSx,
+  tagChipSx,
+  titleSx,
+  titleWrapSx,
+  valueSx,
+} from './styles/jobDrawerStyles';
 
 const getAppTags = (app) => {
   if (!app) return [];
@@ -48,7 +74,7 @@ const getCreatedDate = (app) => {
   return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'});
 };
 
-export default function JobDrawer({open, app, onClose, onSaveNote, onSaveInterviewStatus, onSaveEdit}) {
+function JobDrawer({open, app, onClose, onSaveNote, onSaveInterviewStatus, onSaveEdit}) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [noteValue, setNoteValue] = useState('');
   const [editFormData, setEditFormData] = useState({
@@ -61,26 +87,30 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
     tags: '',
   });
 
-  useEffect(() => {
-    if (open) {
-      setNoteValue(app?.note || app?.notes || '');
-      setEditFormData({
-        position: app?.position || app?.jobTitle || '',
-        company: app?.company || app?.companyName || '',
-        location: app?.location || '',
-        workType: app?.workType || '',
-        jobUrl: app?.jobUrl || app?.url || '',
-        platform: app?.platform || '',
-        tags: Array.isArray(app?.tags) ? app.tags.join(', ') : app?.tags || '',
-      });
-    }
-  }, [app, open]);
+  // Track derived state to avoid useEffect synchronization issues
+  const [prevAppId, setPrevAppId] = useState(null);
+  const [prevOpen, setPrevOpen] = useState(open);
 
-  useEffect(() => {
+  if (open && app && app.id !== prevAppId) {
+    setPrevAppId(app.id);
+    setNoteValue(app?.note || app?.notes || '');
+    setEditFormData({
+      position: app?.position || app?.jobTitle || '',
+      company: app?.company || app?.companyName || '',
+      location: app?.location || '',
+      workType: app?.workType || '',
+      jobUrl: app?.jobUrl || app?.url || '',
+      platform: app?.platform || '',
+      tags: Array.isArray(app?.tags) ? app.tags.join(', ') : app?.tags || '',
+    });
+  }
+
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (!open) {
       setIsEditMode(false);
     }
-  }, [open]);
+  }
 
   const handleSaveNote = () => {
     if (!app || !onSaveNote) return;
@@ -140,26 +170,31 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
   const jobLink = getCompanyLink(app);
 
   return (
-    <Drawer anchor="right" open={open} onClose={onClose} PaperProps={{sx: {width: {xs: '100%', sm: 420}}}}>
-      <Box sx={{height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#fff'}}>
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      slotProps={{paper: {sx: drawerPaperSx}}}
+    >
+      <Box sx={drawerRootSx}>
         {/* Header */}
-        <Box sx={{p: 2.5, borderBottom: '1px solid #e6e6e6'}}>
-          <Box sx={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5}}>
-            <Box sx={{display: 'flex', gap: 1.5, minWidth: 0}}>
+        <Box sx={sectionSx}>
+          <Box sx={headerRowSx}>
+            <Box sx={titleWrapSx}>
               <Box
                 component="img"
                 src={app?.companyLogo || '/src/assets/logo.svg'}
                 alt={app?.company || app?.companyName || 'Company logo'}
-                sx={{width: 34, height: 34, borderRadius: 1, objectFit: 'cover'}}
+                sx={logoSx}
               />
               <Box sx={{minWidth: 0}}>
-                <Typography variant="subtitle1" sx={{fontWeight: 700, lineHeight: 1.2}} noWrap>
+                <Typography variant="subtitle1" sx={titleSx} noWrap>
                   {isEditMode ? editFormData.position : app?.position || app?.jobTitle || 'Untitled Role'}
                 </Typography>
                 <Chip
                   label={app?.status || 'Applied'}
                   size="small"
-                  sx={{mt: 1, height: 22, borderRadius: 99, bgcolor: '#fde8ea', color: '#cb3f4b', fontSize: 11}}
+                  sx={statusChipSx}
                 />
               </Box>
             </Box>
@@ -178,7 +213,7 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
 
         {/* Edit Mode Form */}
         {isEditMode ? (
-          <Box sx={{p: 2.5, borderBottom: '1px solid #e6e6e6', overflowY: 'auto', flex: 1}}>
+          <Box sx={scrollSectionSx}>
             <Stack spacing={2}>
               <TextField
                 label="Position"
@@ -252,34 +287,34 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
         ) : (
           <>
             {/* View Mode Content */}
-            <Box sx={{p: 2.5, borderBottom: '1px solid #e6e6e6', overflowY: 'auto', flex: 1}}>
+            <Box sx={scrollSectionSx}>
               <Stack spacing={1.6}>
                 <Box sx={{display: 'flex', gap: 1.5}}>
-                  <LocationOnOutlinedIcon sx={{fontSize: 20, color: '#5f6368', mt: 0.2}} />
+                  <LocationOnOutlinedIcon sx={iconMetaSx} />
                   <Box>
-                    <Typography sx={{fontSize: 13, fontWeight: 600}}>Location</Typography>
-                    <Typography sx={{fontSize: 13, color: '#5f6368'}}>{app?.location || 'Tlv, IL'}</Typography>
+                    <Typography sx={labelSx}>Location</Typography>
+                    <Typography sx={valueSx}>{app?.location || 'Tlv, IL'}</Typography>
                   </Box>
                 </Box>
 
                 <Box sx={{display: 'flex', gap: 1.5}}>
-                  <WorkOutlineOutlinedIcon sx={{fontSize: 20, color: '#5f6368', mt: 0.2}} />
+                  <WorkOutlineOutlinedIcon sx={iconMetaSx} />
                   <Box>
-                    <Typography sx={{fontSize: 13, fontWeight: 600}}>Work Type</Typography>
-                    <Typography sx={{fontSize: 13, color: '#5f6368'}}>{app?.workType || 'Hybrid'}</Typography>
+                    <Typography sx={labelSx}>Work Type</Typography>
+                    <Typography sx={valueSx}>{app?.workType || 'Hybrid'}</Typography>
                   </Box>
                 </Box>
 
                 <Box sx={{display: 'flex', gap: 1.5}}>
-                  <LinkOutlinedIcon sx={{fontSize: 20, color: '#5f6368', mt: 0.2}} />
+                  <LinkOutlinedIcon sx={iconMetaSx} />
                   <Box sx={{minWidth: 0}}>
-                    <Typography sx={{fontSize: 13, fontWeight: 600}}>Job URL</Typography>
+                    <Typography sx={labelSx}>Job URL</Typography>
                     <Typography
                       component={jobLink ? 'a' : 'span'}
                       href={jobLink || undefined}
                       target={jobLink ? '_blank' : undefined}
                       rel={jobLink ? 'noreferrer' : undefined}
-                      sx={{fontSize: 13, color: '#3b82f6', textDecoration: 'none', wordBreak: 'break-all'}}
+                      sx={linkSx}
                     >
                       {jobLink || 'https://example.com/careers/developer'}
                     </Typography>
@@ -287,33 +322,33 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
                 </Box>
               </Stack>
 
-              <Typography sx={{mt: 2.5, mb: 1.25, fontWeight: 700}}>Tags</Typography>
+              <Typography sx={sectionTitleSx}>Tags</Typography>
               <Stack direction="row" useFlexGap flexWrap="wrap" spacing={1}>
                 {(tags.length ? tags : ['Rest API', 'React', 'Node.js']).map((tag) => (
                   <Chip
                     key={tag}
                     label={tag}
                     size="small"
-                    sx={{height: 24, borderRadius: 99, bgcolor: '#f8eaea', color: '#5f6368', fontSize: 12}}
+                    sx={tagChipSx}
                   />
                 ))}
               </Stack>
 
-              <Typography sx={{mt: 2.5, mb: 1.25, fontWeight: 700}}>Extra Details</Typography>
+              <Typography sx={sectionTitleSx}>Extra Details</Typography>
               <Stack spacing={0.6}>
-                <Typography sx={{fontSize: 13}}>Created At: {getCreatedDate(app)}</Typography>
-                <Typography sx={{fontSize: 13}}>Applied At: {getAppliedDate(app)}</Typography>
-                <Typography sx={{fontSize: 13}}>Platform: {app?.platform || 'LinkedIn'}</Typography>
+                <Typography sx={metaTextSx}>Created At: {getCreatedDate(app)}</Typography>
+                <Typography sx={metaTextSx}>Applied At: {getAppliedDate(app)}</Typography>
+                <Typography sx={metaTextSx}>Platform: {app?.platform || 'LinkedIn'}</Typography>
               </Stack>
 
               {app?.statusHistory && app.statusHistory.length > 0 && (
                 <>
-                  <Typography sx={{mt: 2.5, mb: 1.25, fontWeight: 700}}>Status History</Typography>
+                  <Typography sx={sectionTitleSx}>Status History</Typography>
                   <Stack spacing={1}>
                     {app.statusHistory.map((entry, idx) => (
-                      <Box key={idx} sx={{p: 1.5, bgcolor: '#f5f5f5', borderRadius: 1}}>
-                        <Typography sx={{fontSize: 12, fontWeight: 600}}>{entry.status}</Typography>
-                        <Typography sx={{fontSize: 11, color: '#5f6368'}}>
+                      <Box key={`${entry.timestamp}-${idx}`} sx={historyEntrySx}>
+                        <Typography sx={historyStatusSx}>{entry.status}</Typography>
+                        <Typography sx={historyTimeSx}>
                           {new Date(entry.timestamp).toLocaleDateString()} at {new Date(entry.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                         </Typography>
                       </Box>
@@ -324,8 +359,8 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
             </Box>
 
             {/* Notes Section */}
-            <Box sx={{p: 2.5, borderBottom: '1px solid #e6e6e6'}}>
-              <Typography sx={{mb: 1, fontSize: 13, color: '#5f6368'}}>Notes</Typography>
+            <Box sx={sectionSx}>
+              <Typography sx={notesLabelSx}>Notes</Typography>
               <TextField
                 fullWidth
                 multiline
@@ -333,11 +368,7 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
                 value={noteValue}
                 onChange={(e) => setNoteValue(e.target.value)}
                 placeholder="Add a note here...."
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    bgcolor: '#fafafa',
-                  },
-                }}
+                sx={notesInputSx}
               />
               <Box sx={{display: 'flex', justifyContent: 'flex-end', mt: 0.8}}>
                 <Button variant="outlined" size="small" onClick={handleSaveNote}>Save Notes</Button>
@@ -348,17 +379,13 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
 
         {/* Bottom CTA */}
         {!isEditMode && (
-          <Box sx={{mt: 'auto', p: 2.5}}>
+          <Box sx={ctaWrapSx}>
             <Divider sx={{mb: 2}} />
             <Button
               fullWidth
               variant="contained"
               onClick={handleInterviewCta}
-              sx={{
-                textTransform: 'none',
-                borderRadius: 1.5,
-                background: 'linear-gradient(180deg, #5db3ff 0%, #2f87dd 100%)',
-              }}
+              sx={ctaButtonSx}
             >
               I have an Interview
             </Button>
@@ -368,3 +395,42 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
     </Drawer>
   );
 }
+
+JobDrawer.propTypes = {
+  open: PropTypes.bool.isRequired,
+  app: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    position: PropTypes.string,
+    jobTitle: PropTypes.string,
+    company: PropTypes.string,
+    companyName: PropTypes.string,
+    companyLogo: PropTypes.string,
+    location: PropTypes.string,
+    workType: PropTypes.string,
+    jobUrl: PropTypes.string,
+    url: PropTypes.string,
+    link: PropTypes.string,
+    platform: PropTypes.string,
+    status: PropTypes.string,
+    note: PropTypes.string,
+    notes: PropTypes.string,
+    tags: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
+    skills: PropTypes.arrayOf(PropTypes.string),
+    appliedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+    createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+    updatedAt: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)]),
+    statusHistory: PropTypes.arrayOf(PropTypes.shape({
+      status: PropTypes.string,
+      timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.instanceOf(Date)])
+    }))
+  }),
+  onClose: PropTypes.func.isRequired,
+  onSaveNote: PropTypes.func,
+  onSaveInterviewStatus: PropTypes.func,
+  onSaveEdit: PropTypes.func
+};
+
+export default JobDrawer;
