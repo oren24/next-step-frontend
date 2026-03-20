@@ -6,6 +6,8 @@ A modern, full-featured web application for tracking and managing job applicatio
 
 Nextstep is a comprehensive job application tracking system built with React and Material-UI. It helps job seekers organize, manage, and analyze their job search progress with an elegant and responsive interface.
 
+Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/components/layout/Layout.jsx`, with nested routes rendering page content through `<Outlet />`.
+
 ## ✨ Features
 
 ### Core Features
@@ -36,9 +38,10 @@ Nextstep is a comprehensive job application tracking system built with React and
 
 ## 🛠️ Tech Stack
 
-- **Frontend Framework**: React 18
+- **Frontend Framework**: React 19
 - **Build Tool**: Vite
 - **UI Library**: Material-UI (MUI)
+- **Routing**: React Router 7
 - **Styling**: Emotion (CSS-in-JS)
 - **Code Quality**: ESLint
 - **Icons**: Material-UI Icons, SVG Assets
@@ -50,7 +53,7 @@ frontend/
 ├── src/
 │   ├── components/
 │   │   ├── cards/              # Application card components
-│   │   ├── exporters/          # Export functionality (CSV, JSON)
+│   │   ├── exporters/          # Export functionality (CSV)
 │   │   ├── layout/             # Main layout components (TopBar, Sidebar, ViewToggle)
 │   │   ├── list/               # List view components
 │   │   └── popapmodals/        # Modal dialogs (Add, Edit, Delete)
@@ -77,7 +80,7 @@ frontend/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (LTS recommended)
 - npm or yarn
 
 ### Installation
@@ -132,10 +135,20 @@ Toggle between light and dark mode using the theme button in the top bar. The ap
 
 ## 🔐 Data Management
 
-Currently uses mock data for development. Data structure is ready for backend integration:
+This frontend currently uses mock data for development. `apps` state is initialized from `src/data/mockApplications.js` and updated in-memory in `src/pages/JobApplications.jsx` (no backend persistence in this repository).
+
+Data structure is ready for backend integration:
 - JobApplication type with comprehensive fields
 - Company information integration
 - Tag-based categorization system
+
+> Note: Data resets on refresh because there is no API/storage layer connected yet.
+
+## 🧪 Testing and Validation
+
+- Run lint checks with `npm run lint`
+- There is currently no `npm test` script in `package.json`
+- Validate UI changes manually in both List and Kanban views, and in both light/dark themes
 
 ## 🐛 Known Issues & Future Improvements
 
