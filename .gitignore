@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local agent/runtime artifacts
+/events.json
+/agents.md
+/AGENTS.md
+/.rigour
+

@@ -201,9 +201,10 @@ When submitting a pull request:
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👨‍💼 Author
+## 👨‍💼 Authors
 
-**Nextstep Development Team**
+- [Oren Drori](https://github.com/oren24)
+- [Rima Rabinovich Brikman](https://github.com/RimaRabinovich)
 
 ---
 
