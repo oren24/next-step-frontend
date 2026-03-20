@@ -296,8 +296,9 @@ export default function ApplicationsListView({ apps, onAdd, onEdit, onDelete, on
   }, [rows, statusFilter]);
 
   const handleOpenEdit = (app) => {
-    setSelectedApp(app);
-    setEditModalOpen(true);
+    if (onEdit) {
+      onEdit(app);
+    }
   };
 
   const handleOpenDelete = (app) => {

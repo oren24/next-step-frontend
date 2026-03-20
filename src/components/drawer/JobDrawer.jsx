@@ -65,8 +65,8 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
     if (open) {
       setNoteValue(app?.note || app?.notes || '');
       setEditFormData({
-        position: app?.position || '',
-        company: app?.company || '',
+        position: app?.position || app?.jobTitle || '',
+        company: app?.company || app?.companyName || '',
         location: app?.location || '',
         workType: app?.workType || '',
         jobUrl: app?.jobUrl || app?.url || '',
@@ -149,12 +149,12 @@ export default function JobDrawer({open, app, onClose, onSaveNote, onSaveIntervi
               <Box
                 component="img"
                 src={app?.companyLogo || '/src/assets/logo.svg'}
-                alt={app?.company || 'Company logo'}
+                alt={app?.company || app?.companyName || 'Company logo'}
                 sx={{width: 34, height: 34, borderRadius: 1, objectFit: 'cover'}}
               />
               <Box sx={{minWidth: 0}}>
                 <Typography variant="subtitle1" sx={{fontWeight: 700, lineHeight: 1.2}} noWrap>
-                  {isEditMode ? editFormData.position : app?.position || 'Untitled Role'}
+                  {isEditMode ? editFormData.position : app?.position || app?.jobTitle || 'Untitled Role'}
                 </Typography>
                 <Chip
                   label={app?.status || 'Applied'}
