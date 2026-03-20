@@ -111,11 +111,19 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
           '&:hover': {
             boxShadow: cardStyle.boxShadow || '0 4px 12px rgba(0,0,0,0.08)',
             transform: 'none',
-          }
-        } : cardStyle}
+          },
+          cursor: 'default',
+        } : {...cardStyle, cursor: 'pointer'}}
         ref={innerRef}
         {...(dropdownOpen ? {} : draggableProps)}
         {...(dropdownOpen ? {} : dragHandleProps)}
+        onClick={(e) => {
+          if (!dropdownOpen && !e.target.closest('button')) {
+            if (onEdit) {
+              onEdit(app);
+            }
+          }
+        }}
       >
         {/* Custom header with absolute positioning */}
         <Box sx={CARD.header}>
