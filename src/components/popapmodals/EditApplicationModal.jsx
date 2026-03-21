@@ -23,9 +23,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { EDIT_MODAL } from './styles/editModalStyles';
+import { JOB_STATUSES } from '../../constants/jobStatuses.js';
+import { WORK_TYPES } from '../../constants/workTypes.js';
 
-const WORK_TYPES = ['Remote', 'On site', 'Hybrid'];
-const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
 
 const createInitialFormData = (application) => ({
   companyName: application?.companyName || '',

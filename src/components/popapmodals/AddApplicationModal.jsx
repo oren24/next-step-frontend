@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import {
+  Autocomplete,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -18,14 +19,32 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Chip,
-  Stack,
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { ADD_MODAL } from './styles/addModalStyles';
+import { JOB_STATUSES } from '../../constants/jobStatuses.js';
+import { WORK_TYPES } from '../../constants/workTypes.js';
+import { mockTags } from '../../data/mockTags.js';
 
-const WORK_TYPES = ['Remote', 'On site', 'Hybrid'];
-const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
+
+const MAX_TAGS = 5;
+
+const normalizeTags = (tags) => {
+  const seen = new Set();
+  const unique = [];
+
+  tags.forEach((tag) => {
+    const trimmed = String(tag || '').trim();
+    if (!trimmed) return;
+
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    unique.push(trimmed);
+  });
+
+  return unique.slice(0, MAX_TAGS);
+};
 
 const createInitialFormData = (status) => ({
   companyName: '',
@@ -47,11 +66,9 @@ const createInitialFormData = (status) => ({
 
 const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoading = false }) => {
   const [formData, setFormData] = useState(() => createInitialFormData(status));
-  const [tagInput, setTagInput] = useState('');
 
   const handleDialogEnter = () => {
     setFormData(createInitialFormData(status));
-    setTagInput('');
   };
 
   const handleInputChange = (e) => {
@@ -62,37 +79,38 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
     }));
   };
 
-  const handleAddTag = () => {
-    if (tagInput.trim() && formData.tags.length < 5) {
-      setFormData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()],
-      }));
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (indexToRemove) => {
+  const handleTagsChange = (_, nextTags) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((_, index) => index !== indexToRemove),
+      tags: normalizeTags(nextTags),
     }));
   };
 
-  const handleSave = () => {
-    if (onSave && formData.companyName && formData.jobTitle) {
-      // Create new application with generated ID and timestamps
-      const newApp = {
-        id: `app_${Date.now()}`,
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      onSave(newApp);
-    }
+  const handleSave = (asDraft = false) => {
+    if (!onSave) return;
+
+    const companyName = formData.companyName.trim();
+    const jobTitle = formData.jobTitle.trim();
+
+    if (!asDraft && (!companyName || !jobTitle)) return;
+
+    const now = new Date().toISOString();
+    const newApp = {
+      id: `app_${Date.now()}`,
+      ...formData,
+      companyName,
+      jobTitle,
+      tags: normalizeTags(formData.tags),
+      createdAt: now,
+      updatedAt: now,
+      isDraft: asDraft,
+      draftSavedAt: asDraft ? now : null,
+    };
+
+    onSave(newApp);
   };
 
-  const isFormValid = formData.companyName.trim() && formData.jobTitle.trim();
+  const isFormValid = Boolean(formData.companyName.trim() && formData.jobTitle.trim());
 
   return (
     <Dialog
@@ -228,36 +246,24 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
 
           {/* Tags */}
           <Box>
-            <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-              <TextField
-                size="small"
-                placeholder="Add tag"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-                disabled={formData.tags.length >= 5}
-                sx={{ flex: 1 }}
-              />
-              <Button
-                onClick={handleAddTag}
-                disabled={!tagInput.trim() || formData.tags.length >= 5}
-                size="small"
-              >
-                Add
-              </Button>
-            </Box>
-            {formData.tags.length > 0 && (
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                {formData.tags.map((tag, index) => (
-                  <Chip
-                    key={index}
-                    label={tag}
-                    onDelete={() => handleRemoveTag(index)}
-                    size="small"
-                  />
-                ))}
-              </Stack>
-            )}
+            <Autocomplete
+              multiple
+              freeSolo
+              size="small"
+              options={mockTags}
+              value={formData.tags}
+              onChange={handleTagsChange}
+              filterSelectedOptions
+              disabled={isLoading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Tags"
+                  placeholder={formData.tags.length >= MAX_TAGS ? 'Max 5 tags' : 'Add tags'}
+                  helperText="Choose from suggestions or type your own tags (max 5)."
+                />
+              )}
+            />
           </Box>
 
           {/* Interview and Offer Details */}
@@ -352,6 +358,13 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
           variant="outlined"
         >
           Cancel
+        </Button>
+        <Button
+          onClick={() => handleSave(true)}
+          disabled={isLoading}
+          variant="outlined"
+        >
+          Save as Draft
         </Button>
         <Button
           onClick={handleSave}

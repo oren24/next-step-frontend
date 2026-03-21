@@ -25,7 +25,7 @@ export function ThemeToggle({ isDarkMode, onToggle }) {
 }
 
 // Search Bar Component
-export function SearchBar({ placeholder = 'Search..', theme }) {
+export function SearchBar({ placeholder = 'Search..', theme, value = '', onChange }) {
   return (
     <Box sx={{
       position: 'relative',
@@ -52,6 +52,10 @@ export function SearchBar({ placeholder = 'Search..', theme }) {
       </Box>
       <InputBase 
         placeholder={placeholder} 
+        value={value}
+        onChange={(event) => {
+          if (onChange) onChange(event.target.value);
+        }}
         sx={{
           color: 'inherit',
           width: '100%',

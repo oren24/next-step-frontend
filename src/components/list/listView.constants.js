@@ -1,4 +1,4 @@
-export const JOB_STATUSES = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
+import { JOB_STATUSES } from '../../constants/jobStatuses.js';
 
 export const STATUS_FILTERS = ['All', ...JOB_STATUSES];
 

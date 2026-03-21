@@ -1,12 +1,31 @@
 import React from 'react';
-import { Box, Button, Typography, useTheme } from '@mui/material';
+import { Box, Button, Menu, MenuItem, Typography, useTheme } from '@mui/material';
 import { exportApplicationsToCSV } from '../exporters/csvExporter.js';
 
 const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
   const theme = useTheme();
+  const [exportMenuAnchor, setExportMenuAnchor] = React.useState(null);
 
-  const handleExport = () => {
-    exportApplicationsToCSV(applications);
+  const handleOpenExportMenu = (event) => {
+    setExportMenuAnchor(event.currentTarget);
+  };
+
+  const handleCloseExportMenu = () => {
+    setExportMenuAnchor(null);
+  };
+
+  const handleExport = async (format) => {
+    if (format === 'xlsx') {
+      try {
+        const { exportApplicationsToXLSX } = await import('../exporters/xlsxExporter.js');
+        exportApplicationsToXLSX(applications);
+      } catch (error) {
+        console.error('Failed to load Excel exporter:', error);
+      }
+    } else {
+      exportApplicationsToCSV(applications);
+    }
+    handleCloseExportMenu();
   };
 
   const buttonBaseStyle = {
@@ -157,7 +176,7 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
       </Box>
 
       {/* Right side - Export button */}
-      <Button sx={exportButtonStyle} onClick={handleExport}>
+      <Button sx={exportButtonStyle} onClick={handleOpenExportMenu}>
         <Box
           component="img"
           src="/src/assets/main section icons/excel.svg"
@@ -172,6 +191,15 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
           Export
         </Typography>
       </Button>
+
+      <Menu
+        anchorEl={exportMenuAnchor}
+        open={Boolean(exportMenuAnchor)}
+        onClose={handleCloseExportMenu}
+      >
+        <MenuItem onClick={() => handleExport('csv')}>Export CSV</MenuItem>
+        <MenuItem onClick={() => handleExport('xlsx')}>Export Excel (.xlsx)</MenuItem>
+      </Menu>
     </Box>
   );
 };

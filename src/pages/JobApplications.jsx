@@ -1,6 +1,5 @@
 import React, {useMemo, useState} from 'react';
-import {Box, Paper, Stack, Typography} from '@mui/material';
-import {mockApplications} from '../data/mockApplications.js';
+import {Box, Paper, Skeleton, Stack, Typography} from '@mui/material';
 import {DndContext, useDroppable, DragOverlay, useSensor, useSensors, PointerSensor, TouchSensor} from '@dnd-kit/core';
 import {rectSortingStrategy, SortableContext} from '@dnd-kit/sortable';
 import DraggableItem from '../components/cards/DraggableItem.jsx';
@@ -8,10 +7,14 @@ import ApplicationCard from '../components/cards/ApplicationCard.jsx';
 import AddApplicationModal from '../components/popapmodals/AddApplicationModal.jsx';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
 import ApplicationsListView from '../components/list/ApplicationsListView.jsx';
+import {JOB_STATUSES} from '../constants/jobStatuses.js';
 import JobDrawer from '../components/drawer/JobDrawer.jsx';
+import { shareJobApplication } from '../components/cards/shareJob.js';
 import {BOARD, STATUS_COLORS, EMPTY_STATE_GRADIENTS} from './styles/jobApplicationsStyles';
 
-const STATUS_ORDER = ['Wishlist', 'Applied', 'Interviewing', 'Offer', 'Rejected'];
+const STATUS_ORDER = JOB_STATUSES;
+const INTERVIEWING_STATUS = 'Interviewing';
+const NOOP = () => {};
 
 // Status icon configuration
 const STATUS_ICONS = {
@@ -30,9 +33,47 @@ const EMPTY_STATE_MESSAGES = {
   'Rejected': 'Rejected Job',
 };
 
+const ICON_STYLE_BY_STATUS = {
+  'Wishlist': BOARD.wishlistIcon,
+  'Applied': BOARD.appliedIcon,
+  'Interviewing': BOARD.interviewingIcon,
+  'Offer': BOARD.offerIcon,
+  'Rejected': BOARD.rejectedIcon,
+};
+
+const PLUS_ICON_STYLE_BY_STATUS = {
+  'Wishlist': BOARD.wishlistPlusIcon,
+  'Applied': BOARD.appliedPlusIcon,
+  'Interviewing': BOARD.interviewingPlusIcon,
+  'Offer': BOARD.offerPlusIcon,
+  'Rejected': BOARD.rejectedPlusIcon,
+};
+
+const getNowIso = () => new Date().toISOString();
+
+const withStatusHistoryEntry = (app, status, timestamp) => ({
+  ...app,
+  statusHistory: [...(app.statusHistory || []), {status, timestamp}],
+});
+
 const getEmptyStateText = (status) => {
   return `Drag Your First ${EMPTY_STATE_MESSAGES[status] || status} Here!`;
 };
+
+const BoardSkeleton = () => (
+  <Box sx={BOARD.columnsWrapper}>
+    {Array.from({length: 3}).map((_, index) => (
+      <Paper key={`board-skeleton-${index}`} elevation={1} sx={BOARD.columnPaper}>
+        <Skeleton variant="rounded" height={44} />
+        <Stack spacing={1.25} sx={{mt: 1}}>
+          <Skeleton variant="rounded" height={95} />
+          <Skeleton variant="rounded" height={95} />
+          <Skeleton variant="rounded" height={95} />
+        </Stack>
+      </Paper>
+    ))}
+  </Box>
+);
 
 // Helper component for empty state
 const EmptyStateCard = ({ status, colors, iconStyle, statusIcon }) => (
@@ -63,11 +104,16 @@ const EmptyStateCard = ({ status, colors, iconStyle, statusIcon }) => (
 );
 
 // Helper component for draggable items
-const DraggableItemWrapper = ({ app, status, updateAppStatus, onDelete, onEdit }) => {
+const DraggableItemWrapper = ({ app, status, updateAppStatus, onDelete, onEdit, onShare }) => {
   const leftStatus = STATUS_ORDER[Math.max(0, STATUS_ORDER.indexOf(status) - 1)];
   const rightStatus = STATUS_ORDER[Math.min(STATUS_ORDER.length - 1, STATUS_ORDER.indexOf(status) + 1)];
   const isFirst = status === STATUS_ORDER[0];
   const isLast = status === STATUS_ORDER.at(-1);
+
+  const handleUpdateAppStatus = (id, toStatus) => {
+    if (toStatus) return updateAppStatus(id, toStatus);
+    return null;
+  };
 
   return (
     <DraggableItem
@@ -75,12 +121,10 @@ const DraggableItemWrapper = ({ app, status, updateAppStatus, onDelete, onEdit }
       app={app}
       leftStatus={leftStatus}
       rightStatus={rightStatus}
-      updateAppStatus={(id, toStatus) => {
-        if (toStatus) return updateAppStatus(id, toStatus);
-        return null;
-      }}
+      updateAppStatus={handleUpdateAppStatus}
       onDelete={onDelete}
       onEdit={onEdit}
+      onShare={onShare}
       isFirst={isFirst}
       isLast={isLast}
     />
@@ -163,34 +207,29 @@ const buildColumns = (apps) => {
 };
 
 // Column component moved out of JobApplications for lint rules
-const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, onAdd}) => {
+const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, onShare, onAdd}) => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const {isOver, setNodeRef} = useDroppable({id: status});
   const colors = STATUS_COLORS[status] || STATUS_COLORS.Wishlist;
-
-  // Icon styles configuration
-  const iconStylesConfig = {
-    'Wishlist': BOARD.wishlistIcon,
-    'Applied': BOARD.appliedIcon,
-    'Interviewing': BOARD.interviewingIcon,
-    'Offer': BOARD.offerIcon,
-    'Rejected': BOARD.rejectedIcon,
-  };
-
-  const plusIconStylesConfig = {
-    'Wishlist': BOARD.wishlistPlusIcon,
-    'Applied': BOARD.appliedPlusIcon,
-    'Interviewing': BOARD.interviewingPlusIcon,
-    'Offer': BOARD.offerPlusIcon,
-    'Rejected': BOARD.rejectedPlusIcon,
-  };
-
-  const iconStyle = iconStylesConfig[status];
-  const plusIconStyle = plusIconStylesConfig[status];
+  const iconStyle = ICON_STYLE_BY_STATUS[status];
+  const plusIconStyle = PLUS_ICON_STYLE_BY_STATUS[status];
   const statusIcon = STATUS_ICONS[status];
   const isRejectedStatus = status === 'Rejected';
   const isEmpty = appsInColumn.length === 0;
   const columnStackOverStyle = isOver ? BOARD.columnStackOver : {};
+
+  const handleOpenAddModal = () => {
+    setAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setAddModalOpen(false);
+  };
+
+  const handleSaveNewApp = (newApp) => {
+    onAdd(newApp);
+    setAddModalOpen(false);
+  };
 
   return (
     <Paper elevation={1} sx={BOARD.columnPaper}>
@@ -201,7 +240,7 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, o
         iconStyle={iconStyle}
         statusIcon={statusIcon}
         plusIconStyle={plusIconStyle}
-        onAddClick={() => setAddModalOpen(true)}
+        onAddClick={handleOpenAddModal}
       />
 
       <SortableContext items={appsInColumn.map((a) => a.id)} strategy={rectSortingStrategy}>
@@ -227,6 +266,7 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, o
                   updateAppStatus={updateAppStatus}
                   onDelete={onDelete}
                   onEdit={onEdit}
+                  onShare={onShare}
                 />
               ))}
               {isOver && (
@@ -239,24 +279,46 @@ const Column = ({status, appsInColumn = [], updateAppStatus, onDelete, onEdit, o
 
       <AddApplicationModal
         open={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        onSave={(newApp) => {
-          onAdd(newApp);
-          setAddModalOpen(false);
-        }}
+        onClose={handleCloseAddModal}
+        onSave={handleSaveNewApp}
         status={status}
       />
     </Paper>
   );
 };
 
-export default function JobApplications() {
-  const [apps, setApps] = useState(() => mockApplications.map((a) => ({...a})));
+const queryMatchesApp = (app, query) => {
+  if (!query) return true;
+  const haystack = [
+    app.companyName,
+    app.company,
+    app.jobTitle,
+    app.position,
+    app.platform,
+    app.location,
+    app.notes,
+    ...(app.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return haystack.includes(query);
+};
+
+export default function JobApplications({ apps, setApps, onDeleteApplication, searchQuery = '', isLoading = false }) {
   const [currentView, setCurrentView] = useState('kanban');
   const [selectedApp, setSelectedApp] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const columns = useMemo(() => buildColumns(apps), [apps]);
+  const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+  const filteredApps = useMemo(
+    () => apps.filter((app) => queryMatchesApp(app, normalizedSearchQuery)),
+    [apps, normalizedSearchQuery]
+  );
+
+  const columns = useMemo(() => buildColumns(filteredApps), [filteredApps]);
 
   const [activeId, setActiveId] = useState(null);
 
@@ -271,17 +333,14 @@ export default function JobApplications() {
       const copy = prev.map((p) => ({...p}));
       const idx = copy.findIndex((c) => c.id === appId);
       if (idx === -1) return prev;
+      const now = getNowIso();
       const oldStatus = copy[idx].status;
       copy[idx].status = newStatus;
-      copy[idx].updatedAt = new Date().toISOString();
+      copy[idx].updatedAt = now;
 
       // Add to status history
-      if (!copy[idx].statusHistory) copy[idx].statusHistory = [];
       if (oldStatus !== newStatus) {
-        copy[idx].statusHistory.push({
-          status: newStatus,
-          timestamp: new Date().toISOString(),
-        });
+        copy[idx] = withStatusHistoryEntry(copy[idx], newStatus, now);
       }
 
       return copy;
@@ -289,6 +348,10 @@ export default function JobApplications() {
   };
 
   const handleDeleteApplication = (appId) => {
+    if (onDeleteApplication) {
+      onDeleteApplication(appId);
+      return;
+    }
     setApps((prev) => prev.filter((app) => app.id !== appId));
   };
 
@@ -307,29 +370,28 @@ export default function JobApplications() {
   };
 
   const handleSaveNote = (appId, note) => {
-    setApps((prev) => prev.map((item) => (item.id === appId ? {...item, note, updatedAt: new Date().toISOString()} : item)));
-    setSelectedApp((prev) => (prev && prev.id === appId ? {...prev, note, updatedAt: new Date().toISOString()} : prev));
+    const now = getNowIso();
+    setApps((prev) => prev.map((item) => (item.id === appId ? {...item, note, updatedAt: now} : item)));
+    setSelectedApp((prev) => (prev && prev.id === appId ? {...prev, note, updatedAt: now} : prev));
   };
 
   const handleSaveInterviewStatus = (appId) => {
+    const now = getNowIso();
     setApps((prev) => prev.map((item) => {
       if (item.id !== appId) return item;
-      const updated = {...item, status: 'Interviewing', updatedAt: new Date().toISOString()};
-      if (!updated.statusHistory) updated.statusHistory = [];
-      updated.statusHistory.push({status: 'Interviewing', timestamp: new Date().toISOString()});
-      return updated;
+      const updated = {...item, status: INTERVIEWING_STATUS, updatedAt: now};
+      return withStatusHistoryEntry(updated, INTERVIEWING_STATUS, now);
     }));
     setSelectedApp((prev) => {
       if (!prev || prev.id !== appId) return prev;
-      const updated = {...prev, status: 'Interviewing', updatedAt: new Date().toISOString()};
-      if (!updated.statusHistory) updated.statusHistory = [];
-      updated.statusHistory.push({status: 'Interviewing', timestamp: new Date().toISOString()});
-      return updated;
+      const updated = {...prev, status: INTERVIEWING_STATUS, updatedAt: now};
+      return withStatusHistoryEntry(updated, INTERVIEWING_STATUS, now);
     });
   };
 
   const handleSaveEdit = (updatedApp) => {
-    setApps((prev) => prev.map((item) => (item.id === updatedApp.id ? {...updatedApp, updatedAt: new Date().toISOString()} : item)));
+    const now = getNowIso();
+    setApps((prev) => prev.map((item) => (item.id === updatedApp.id ? {...updatedApp, updatedAt: now} : item)));
     setIsDrawerOpen(false);
   };
 
@@ -349,7 +411,7 @@ export default function JobApplications() {
 
       if (STATUS_ORDER.includes(overId)) {
         activeItem.status = overId;
-        activeItem.updatedAt = new Date().toISOString();
+        activeItem.updatedAt = getNowIso();
         const lastIndex = copy.reduce((acc, p, idx) => (p.status === overId ? idx : acc), -1);
         if (lastIndex === -1) copy.push(activeItem);
         else copy.splice(lastIndex + 1, 0, activeItem);
@@ -363,7 +425,7 @@ export default function JobApplications() {
       }
 
       activeItem.status = copy[overIndex].status;
-      activeItem.updatedAt = new Date().toISOString();
+      activeItem.updatedAt = getNowIso();
       copy.splice(overIndex, 0, activeItem);
       return copy;
     });
@@ -376,38 +438,58 @@ export default function JobApplications() {
   // Helper to find the active item object for the overlay
   const activeItem = activeId ? apps.find((a) => a.id === activeId) : null;
 
+  const renderDragOverlay = () => {
+    if (!activeItem) return null;
+
+    return (
+      <Box sx={{width: 340, pointerEvents: 'none'}}>
+        <ApplicationCard app={activeItem} status={activeItem.status} onMoveLeft={NOOP} onMoveRight={NOOP}/>
+      </Box>
+    );
+  };
+
   const handleViewChange = (view) => {
     setCurrentView(view);
   };
 
+  const handleShareApplication = async (app) => {
+    await shareJobApplication(app);
+  };
+
   return (
     <Box sx={BOARD.container}>
-      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} applications={apps} />
+      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} applications={filteredApps} />
+      {normalizedSearchQuery && (
+        <Typography sx={BOARD.searchResultLabel}>
+          Showing {filteredApps.length} result{filteredApps.length === 1 ? '' : 's'} for "{searchQuery}"
+        </Typography>
+      )}
 
       {currentView === 'list' ? (
         <ApplicationsListView
-          apps={apps}
+          apps={filteredApps}
           onAdd={handleAddApplication}
           onEdit={handleOpenJobDrawer}
           onDelete={handleDeleteApplication}
           onStatusChange={updateAppStatus}
+          isLoading={isLoading}
         />
       ) : (
-        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <Box sx={BOARD.columnsWrapper}>
-            {STATUS_ORDER.map((status) => (
-              <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleOpenJobDrawer} onAdd={handleAddApplication}/>
-            ))}
-          </Box>
+        isLoading ? (
+          <BoardSkeleton />
+        ) : (
+          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <Box sx={BOARD.columnsWrapper}>
+              {STATUS_ORDER.map((status) => (
+                <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleOpenJobDrawer} onShare={handleShareApplication} onAdd={handleAddApplication}/>
+              ))}
+            </Box>
 
-          <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
-            {activeItem ? (
-              <Box sx={{width: 340, pointerEvents: 'none'}}>
-                <ApplicationCard app={activeItem} status={activeItem.status} onMoveLeft={() => {}} onMoveRight={() => {}}/>
-              </Box>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
+              {renderDragOverlay()}
+            </DragOverlay>
+          </DndContext>
+        )
       )}
 
       <JobDrawer

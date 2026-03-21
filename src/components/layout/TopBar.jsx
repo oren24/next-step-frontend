@@ -14,7 +14,15 @@ import {
   UserAvatar,
 } from './TopBarUtils';
 
-export default function TopBar({ onMenuClick, isDarkMode, onToggleTheme, pageTitle, sidebarCollapsed }) {
+export default function TopBar({
+  onMenuClick,
+  isDarkMode,
+  onToggleTheme,
+  pageTitle,
+  sidebarCollapsed,
+  searchQuery,
+  onSearchChange,
+}) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const drawerWidth = sidebarCollapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
@@ -43,7 +51,7 @@ export default function TopBar({ onMenuClick, isDarkMode, onToggleTheme, pageTit
         {/* Right Section */}
         <Box sx={getRightSectionStyle()}>
           <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
-          <SearchBar theme={theme} />
+          <SearchBar theme={theme} value={searchQuery} onChange={onSearchChange} />
           <UserAvatar />
         </Box>
       </Toolbar>

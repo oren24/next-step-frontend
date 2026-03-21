@@ -10,16 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dnd-kit/core": "^4.0.2",
+    "@dnd-kit/sortable": "^5.1.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@dnd-kit/core": "^4.0.2",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@dnd-kit/sortable": "^5.1.0",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

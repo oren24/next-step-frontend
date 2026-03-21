@@ -27,6 +27,13 @@ export const BOARD = {
     overflow: 'hidden',
     bgcolor: 'background.paper',
   },
+  searchResultLabel: {
+    mt: 1,
+    mb: 0.5,
+    ml: 2,
+    color: 'text.secondary',
+    fontSize: '0.86rem',
+  },
   // columns wrapper is column on mobile (stacked), row with horizontal scroll on md+
   columnsWrapper: {
     display: 'flex',
