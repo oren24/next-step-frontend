@@ -306,7 +306,14 @@ const queryMatchesApp = (app, query) => {
   return haystack.includes(query);
 };
 
-export default function JobApplications({ apps, setApps, onDeleteApplication, searchQuery = '', isLoading = false }) {
+export default function JobApplications({
+  apps,
+  setApps,
+  onDeleteApplication,
+  searchQuery = '',
+  isLoading = false,
+  onNotify,
+}) {
   const [currentView, setCurrentView] = useState('kanban');
   const [selectedApp, setSelectedApp] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -458,7 +465,12 @@ export default function JobApplications({ apps, setApps, onDeleteApplication, se
 
   return (
     <Box sx={BOARD.container}>
-      <ViewToggleBar currentView={currentView} onViewChange={handleViewChange} applications={filteredApps} />
+      <ViewToggleBar
+        currentView={currentView}
+        onViewChange={handleViewChange}
+        applications={filteredApps}
+        onNotify={onNotify}
+      />
       {normalizedSearchQuery && (
         <Typography sx={BOARD.searchResultLabel}>
           Showing {filteredApps.length} result{filteredApps.length === 1 ? '' : 's'} for "{searchQuery}"
