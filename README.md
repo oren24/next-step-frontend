@@ -16,24 +16,28 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/components/layout/La
 - **Drag & Drop Support** - Easily move applications between statuses (Wishlist, Applied, Interviewing, Offer, Rejected)
 - **Advanced Filtering & Search** - Find applications by company, title, location, tags, and more
 - **Status Tracking** - Monitor application progress through multiple stages
+- **Archive Workflow** - Review rejected and deleted jobs, then restore or remove entries
 
 ### Data Organization
 - **Tag System** - Organize applications with custom tags (Frontend, Backend, Full Stack, etc.)
 - **Location Tracking** - Filter by location (Remote, On-site, Hybrid)
 - **Work Type Management** - Track different employment types
+- **Draft Support** - Save applications as drafts before finalizing required fields
 - **Interview Details** - Store interview rounds, dates, and notes
 - **Offer Management** - Track offer amounts, deadlines, and currency
 
 ### Export Functionality
-- **CSV Export** - Download all job applications as a CSV file with timestamps
+- **CSV and Excel Export** - Download all job applications as `.csv` or `.xlsx`
 - **Proper Formatting** - Handles special characters, dates, and arrays correctly
 - **Complete Data** - Exports all relevant fields including offer details and interview information
 
 ### UI/UX Features
 - **Dark Mode Support** - Toggle between light and dark themes
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
-- **Real-time Search** - Instant search across all applications
+- **Global Search** - Top-bar search filters applications in both List and Kanban views
+- **Real-time Search** - List view includes instant search/filter controls
 - **Modal Dialogs** - Add, edit, and delete applications with intuitive modals
+- **Share Action** - Share a job via native share sheet or clipboard fallback
 - **Sidebar Navigation** - Quick access to different sections (Dashboard, Resumes, Settings, etc.)
 
 ## 🛠️ Tech Stack
@@ -53,7 +57,7 @@ frontend/
 ├── src/
 │   ├── components/
 │   │   ├── cards/              # Application card components
-│   │   ├── exporters/          # Export functionality (CSV)
+│   │   ├── exporters/          # Export functionality (CSV + XLSX)
 │   │   ├── layout/             # Main layout components (TopBar, Sidebar, ViewToggle)
 │   │   ├── list/               # List view components
 │   │   └── popapmodals/        # Modal dialogs (Add, Edit, Delete)
@@ -117,8 +121,13 @@ frontend/
 
 ### Exporting Data
 1. In the Job Applications page, click the **Export** button
-2. A CSV file will download automatically with your applications data
-3. File format: `job-applications-YYYY-MM-DD.csv`
+2. Select **Export CSV** or **Export Excel (.xlsx)**
+3. File format: `job-applications-YYYY-MM-DD.csv` or `job-applications-YYYY-MM-DD.xlsx`
+
+### Archive and Restore
+1. Open **Archive** from the sidebar
+2. Review rejected and deleted applications
+3. Use **Move to Applied** for rejected jobs, or **Restore** for deleted jobs
 
 ### Organizing with Tags
 - Add custom tags to categorize positions (e.g., "Frontend", "React", "Senior")
@@ -135,7 +144,7 @@ Toggle between light and dark mode using the theme button in the top bar. The ap
 
 ## 🔐 Data Management
 
-This frontend currently uses mock data for development. `apps` state is initialized from `src/data/mockApplications.js` and updated in-memory in `src/pages/JobApplications.jsx` (no backend persistence in this repository).
+This frontend currently uses mock data for development. `apps` state is initialized from `src/data/mockApplications.js` and updated in-memory from `src/App.jsx` (no backend persistence in this repository).
 
 Data structure is ready for backend integration:
 - JobApplication type with comprehensive fields
