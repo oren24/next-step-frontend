@@ -186,13 +186,7 @@ Data structure is ready for backend integration:
 - The default branch is `master`.
 - To see active remote branches, run `git branch -r`.
 
-### Creating a PR
-When submitting a pull request:
-1. Create a feature branch from the appropriate base
-2. Make your changes with clear commit messages
-3. Include a detailed PR description
-4. Test thoroughly before submitting
-5. Request review from team members
+For the full pull request process, see `## 🤝 Contributing` below.
 
 ## 📝 Development Guidelines
 
