@@ -38,7 +38,7 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/routes/AppRoutes.jsx
 - **Real-time Search** - List view includes instant search/filter controls
 - **Modal Dialogs** - Add, edit, and delete applications with intuitive modals
 - **Share Action** - Share a job via native share sheet or clipboard fallback
-- **Sidebar Navigation** - Quick access to different sections (Dashboard, Resumes, Settings, etc.)
+- **Sidebar Navigation** - Quick access to Job Applications, Resumes, Subscriptions, Archive, and Settings
 
 ## 🛠️ Tech Stack
 
@@ -183,10 +183,8 @@ Data structure is ready for backend integration:
 ## 🔄 Git Workflow
 
 ### Current Branches
-- `master` - Production-ready code
-- `feature/list-view` - List view implementation
-- `expeorters` - Export functionality (CSV, JSON)
-- `feature/kanban-view` - Kanban board view implementation
+- The default branch is `master`.
+- To see active remote branches, run `git branch -r`.
 
 ### Creating a PR
 When submitting a pull request:
