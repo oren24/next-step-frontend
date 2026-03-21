@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
 import { mockApplications } from './data/mockApplications.js';
 import AppRoutes from './routes/AppRoutes.jsx';
+import GlobalToast from './components/layout/GlobalToast.jsx';
 
 const getNowIso = () => new Date().toISOString();
 
@@ -29,6 +30,23 @@ function App({ isDarkMode, onToggleTheme }) {
   const [apps, setApps] = useState(() => mockApplications.map((app) => ({ ...app })));
   const [deletedApps, setDeletedApps] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [toast, setToast] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showToast = ({ message, severity = 'success' }) => {
+    setToast({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const closeToast = () => {
+    setToast((prev) => ({ ...prev, open: false }));
+  };
 
   useEffect(() => {
     const timeoutId = globalThis.setTimeout(() => {
@@ -45,6 +63,10 @@ function App({ isDarkMode, onToggleTheme }) {
     if (target) {
       const archiveEntry = buildDeletedArchiveEntry(target);
       setDeletedApps((prev) => [archiveEntry, ...prev]);
+      showToast({
+        message: `${target.companyName || target.company || 'Application'} moved to archive`,
+        severity: 'warning',
+      });
     }
     setApps((prev) => removeById(prev, appId));
   };
@@ -59,18 +81,38 @@ function App({ isDarkMode, onToggleTheme }) {
       if (prev.some((item) => item.id === appId)) return prev;
       return [...prev, restoredApp];
     });
+
+    showToast({
+      message: `${target.companyName || target.company || 'Application'} restored`,
+      severity: 'success',
+    });
   };
 
   const handleRemoveDeleted = (appId) => {
+    const target = findById(deletedApps, appId);
     setDeletedApps((prev) => removeById(prev, appId));
+    if (target) {
+      showToast({
+        message: `${target.companyName || target.company || 'Application'} removed permanently`,
+        severity: 'error',
+      });
+    }
   };
 
   const handleRestoreRejected = (appId) => {
+    const target = findById(apps, appId);
     setApps((prev) => prev.map((item) => (
       item.id === appId
         ? { ...item, status: 'Applied', updatedAt: getNowIso() }
         : item
     )));
+
+    if (target) {
+      showToast({
+        message: `${target.companyName || target.company || 'Application'} moved to Applied`,
+        severity: 'success',
+      });
+    }
   };
 
   return (
@@ -88,6 +130,13 @@ function App({ isDarkMode, onToggleTheme }) {
         onRemoveDeleted={handleRemoveDeleted}
         onRestoreRejected={handleRestoreRejected}
         isLoading={isLoading}
+        onNotify={showToast}
+      />
+      <GlobalToast
+        open={toast.open}
+        message={toast.message}
+        severity={toast.severity}
+        onClose={closeToast}
       />
     </Router>
   );

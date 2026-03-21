@@ -28,6 +28,7 @@ export default function AppRoutes({
   onRemoveDeleted,
   onRestoreRejected,
   isLoading,
+  onNotify,
 }) {
   return (
     <Routes>
@@ -51,6 +52,7 @@ export default function AppRoutes({
               onDeleteApplication={onDeleteApplication}
               searchQuery={searchQuery}
               isLoading={isLoading}
+              onNotify={onNotify}
             />
           )}
         />
@@ -87,5 +89,6 @@ AppRoutes.propTypes = {
   onRemoveDeleted: PropTypes.func.isRequired,
   onRestoreRejected: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  onNotify: PropTypes.func.isRequired,
 };
 
