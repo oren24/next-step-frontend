@@ -25,8 +25,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { LIST, STATUS_COLORS } from '../../pages/styles/jobApplicationsStyles';
+import { JOB_STATUSES } from '../../constants/jobStatuses.js';
 import {
-  JOB_STATUSES,
   STATUS_ICONS,
   STATUS_ICON_FILTERS,
 } from './listView.constants';

@@ -1,6 +1,6 @@
 /**
  * ApplicationCard component
- * @param {{app: import('../../../types/Types.js').JobApplication, status?: import('../../../types/Types.js').JobStatus, draggableProps?: object, dragHandleProps?: object, innerRef?: any, onDelete?: function, onEdit?: function}} props
+ * @param {{app: import('../../../types/Types.js').JobApplication, status?: import('../../../types/Types.js').JobStatus, draggableProps?: object, dragHandleProps?: object, innerRef?: any, onDelete?: function, onEdit?: function, onShare?: function}} props
  */
 
 import React, { useState } from 'react';
@@ -9,7 +9,7 @@ import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
 import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
 import EditApplicationModal from '../popapmodals/EditApplicationModal';
 
-export default function ApplicationCard({ app, status, draggableProps, dragHandleProps, innerRef, onDelete, onEdit }) {
+export default function ApplicationCard({ app, status, draggableProps, dragHandleProps, innerRef, onDelete, onEdit, onShare }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -84,6 +84,15 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
       setIsEditing(false);
       setEditModalOpen(false);
     }
+  };
+
+  const handleShareClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onShare) {
+      await onShare(app);
+    }
+    setDropdownOpen(false);
   };
 
   return (
@@ -181,6 +190,25 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
                 sx={{ width: 24, height: 24 }}
               />
               <Typography sx={CARD.menuItemText}>Move To...</Typography>
+            </Box>
+
+            <Box
+              sx={CARD.interactiveMenuItem}
+              onClick={handleShareClick}
+              component="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+              }}
+            >
+              <Box
+                component="img"
+                src="/src/assets/main section icons/si_link-duotone.svg"
+                alt="Share"
+                sx={{ width: 24, height: 24 }}
+              />
+              <Typography sx={CARD.menuItemText}>Share</Typography>
             </Box>
             
             <Box

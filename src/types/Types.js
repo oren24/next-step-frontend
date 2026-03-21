@@ -35,4 +35,6 @@
  * @property {string} [answerDeadline] - Deadline to return an answer (ISO 8601)
  * @property {number} [offerAmount] - Offered salary amount
  * @property {string} [offerCurrency] - Currency of the offer (e.g., 'ILS', 'USD', 'EUR')
+ * @property {boolean} [isDraft] - Indicates the application was saved as draft
+ * @property {string | null} [draftSavedAt] - Last draft save timestamp (ISO 8601)
  */

@@ -3,26 +3,7 @@
  * Converts job application data to CSV format and downloads it
  */
 
-/**
- * Define the columns that will be exported to CSV
- * The key is used as the object property, the value is the CSV header
- */
-const CSV_COLUMNS = {
-  id: 'ID',
-  companyName: 'Company Name',
-  jobTitle: 'Job Title',
-  location: 'Location',
-  workType: 'Work Type',
-  status: 'Status',
-  tags: 'Tags',
-  createdAt: 'Applied Date',
-  platform: 'Platform',
-  notes: 'Notes',
-  nextInterviewDate: 'Next Interview',
-  round: 'Interview Round',
-  answerDeadline: 'Offer Deadline',
-  offerAmount: 'Offer Amount',
-};
+import { buildExportRows, EXPORT_COLUMNS } from './exportData.js';
 
 /**
  * Escape CSV field values to handle commas, quotes, and newlines
@@ -45,50 +26,23 @@ const escapeCSVValue = (value) => {
 };
 
 /**
- * Format a date string to a readable format
- * @param {string} dateString - ISO date string
- * @returns {string} Formatted date
- */
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-};
-
-/**
  * Convert job applications array to CSV string
  * @param {Array} applications - Array of job application objects
  * @returns {string} CSV formatted string
  */
 export const applicationsToCSV = (applications) => {
-  if (!applications || applications.length === 0) {
+  const rows = buildExportRows(applications);
+  if (!rows.length) {
     return '';
   }
 
   // Create header row
-  const headers = Object.values(CSV_COLUMNS);
+  const headers = Object.values(EXPORT_COLUMNS);
   const headerRow = headers.map(escapeCSVValue).join(',');
 
   // Create data rows
-  const dataRows = applications.map((app) => {
-    const values = Object.keys(CSV_COLUMNS).map((key) => {
-      let value = app[key];
-
-      // Handle special cases for formatting
-      if (key === 'tags' && Array.isArray(value)) {
-        value = value.join('; ');
-      } else if (key === 'createdAt' || key === 'nextInterviewDate' || key === 'answerDeadline') {
-        value = formatDate(value);
-      } else if (key === 'offerAmount' && value) {
-        value = `${value} ${app.offerCurrency || 'USD'}`;
-      }
-
-      return escapeCSVValue(value);
-    });
+  const dataRows = rows.map((row) => {
+    const values = Object.keys(EXPORT_COLUMNS).map((key) => escapeCSVValue(row[key]));
 
     return values.join(',');
   });

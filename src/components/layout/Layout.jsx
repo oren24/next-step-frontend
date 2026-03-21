@@ -13,7 +13,7 @@ const pageTitles = {
   '/settings': 'Settings',
 };
 
-export default function Layout({ isDarkMode, onToggleTheme }) {
+export default function Layout({ isDarkMode, onToggleTheme, searchQuery, onSearchChange }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const theme = useTheme();
@@ -71,6 +71,8 @@ export default function Layout({ isDarkMode, onToggleTheme }) {
           onToggleTheme={onToggleTheme}
           pageTitle={currentPageTitle}
           sidebarCollapsed={sidebarCollapsed}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
         />
 
         {/* Page Content */}

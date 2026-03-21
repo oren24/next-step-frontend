@@ -1,4 +1,4 @@
-import { JOB_STATUSES } from './listView.constants';
+import { JOB_STATUSES } from '../../constants/jobStatuses.js';
 
 export const formatDate = (isoDate) => {
   if (!isoDate) return '--';
