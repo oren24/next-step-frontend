@@ -1,14 +1,28 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { BrowserRouter as Router } from 'react-router-dom';
 import './App.css';
-import Layout from './components/layout/Layout';
 import { mockApplications } from './data/mockApplications.js';
+import AppRoutes from './routes/AppRoutes.jsx';
 
-const JobApplications = lazy(() => import('./pages/JobApplications'));
-const Resumes = lazy(() => import('./pages/Resumes'));
-const Subscriptions = lazy(() => import('./pages/Subscriptions'));
-const Archive = lazy(() => import('./pages/Archive'));
-const Settings = lazy(() => import('./pages/Settings'));
+const getNowIso = () => new Date().toISOString();
+
+const findById = (items, id) => items.find((item) => item.id === id);
+
+const removeById = (items, id) => items.filter((item) => item.id !== id);
+
+const buildDeletedArchiveEntry = (app) => ({
+  ...app,
+  previousStatus: app.status,
+  deletedAt: getNowIso(),
+  archiveReason: 'deleted',
+});
+
+const buildRestoredApp = (app) => ({
+  ...app,
+  status: app.previousStatus || app.status || 'Wishlist',
+  updatedAt: getNowIso(),
+});
 
 function App({ isDarkMode, onToggleTheme }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,128 +41,62 @@ function App({ isDarkMode, onToggleTheme }) {
   }, []);
 
   const handleDeleteApplication = (appId) => {
-    setApps((prev) => {
-      const now = new Date().toISOString();
-      const target = prev.find((item) => item.id === appId);
-      if (target) {
-        setDeletedApps((deletedPrev) => [
-          {
-            ...target,
-            previousStatus: target.status,
-            deletedAt: now,
-            archiveReason: 'deleted',
-          },
-          ...deletedPrev,
-        ]);
-      }
-      return prev.filter((item) => item.id !== appId);
-    });
+    const target = findById(apps, appId);
+    if (target) {
+      const archiveEntry = buildDeletedArchiveEntry(target);
+      setDeletedApps((prev) => [archiveEntry, ...prev]);
+    }
+    setApps((prev) => removeById(prev, appId));
   };
 
   const handleRestoreDeleted = (appId) => {
-    setDeletedApps((prev) => {
-      const target = prev.find((item) => item.id === appId);
-      if (!target) return prev;
+    const target = findById(deletedApps, appId);
+    if (!target) return;
 
-      const restoredApp = {
-        ...target,
-        status: target.previousStatus || target.status || 'Wishlist',
-        updatedAt: new Date().toISOString(),
-      };
-
-      setApps((appsPrev) => {
-        if (appsPrev.some((item) => item.id === appId)) return appsPrev;
-        return [...appsPrev, restoredApp];
-      });
-
-      return prev.filter((item) => item.id !== appId);
+    const restoredApp = buildRestoredApp(target);
+    setDeletedApps((prev) => removeById(prev, appId));
+    setApps((prev) => {
+      if (prev.some((item) => item.id === appId)) return prev;
+      return [...prev, restoredApp];
     });
   };
 
   const handleRemoveDeleted = (appId) => {
-    setDeletedApps((prev) => prev.filter((item) => item.id !== appId));
+    setDeletedApps((prev) => removeById(prev, appId));
   };
 
   const handleRestoreRejected = (appId) => {
     setApps((prev) => prev.map((item) => (
       item.id === appId
-        ? { ...item, status: 'Applied', updatedAt: new Date().toISOString() }
+        ? { ...item, status: 'Applied', updatedAt: getNowIso() }
         : item
     )));
   };
 
-  const routeFallback = <div style={{ padding: 16 }}>Loading...</div>;
-
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={(
-            <Layout
-              isDarkMode={isDarkMode}
-              onToggleTheme={onToggleTheme}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
-          )}
-        >
-          <Route
-            index
-            element={(
-              <Suspense fallback={routeFallback}>
-                <JobApplications
-                  apps={apps}
-                  setApps={setApps}
-                  onDeleteApplication={handleDeleteApplication}
-                  searchQuery={searchQuery}
-                  isLoading={isLoading}
-                />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="resumes"
-            element={(
-              <Suspense fallback={routeFallback}>
-                <Resumes />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="subscriptions"
-            element={(
-              <Suspense fallback={routeFallback}>
-                <Subscriptions />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="archive"
-            element={(
-              <Suspense fallback={routeFallback}>
-                <Archive
-                  apps={apps}
-                  deletedApps={deletedApps}
-                  onRestoreDeleted={handleRestoreDeleted}
-                  onRemoveDeleted={handleRemoveDeleted}
-                  onRestoreRejected={handleRestoreRejected}
-                />
-              </Suspense>
-            )}
-          />
-          <Route
-            path="settings"
-            element={(
-              <Suspense fallback={routeFallback}>
-                <Settings />
-              </Suspense>
-            )}
-          />
-        </Route>
-      </Routes>
+      <AppRoutes
+        isDarkMode={isDarkMode}
+        onToggleTheme={onToggleTheme}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        apps={apps}
+        setApps={setApps}
+        deletedApps={deletedApps}
+        onDeleteApplication={handleDeleteApplication}
+        onRestoreDeleted={handleRestoreDeleted}
+        onRemoveDeleted={handleRemoveDeleted}
+        onRestoreRejected={handleRestoreRejected}
+        isLoading={isLoading}
+      />
     </Router>
   );
 }
 
+App.propTypes = {
+  isDarkMode: PropTypes.bool.isRequired,
+  onToggleTheme: PropTypes.func.isRequired,
+};
+
 export default App;
+

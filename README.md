@@ -6,7 +6,7 @@ A modern, full-featured web application for tracking and managing job applicatio
 
 Nextstep is a comprehensive job application tracking system built with React and Material-UI. It helps job seekers organize, manage, and analyze their job search progress with an elegant and responsive interface.
 
-Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/components/layout/Layout.jsx`, with nested routes rendering page content through `<Outlet />`.
+Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/routes/AppRoutes.jsx` -> `src/components/layout/Layout.jsx`, with nested routes rendering page content through `<Outlet />`.
 
 ## ✨ Features
 
@@ -47,6 +47,7 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/components/layout/La
 - **UI Library**: Material-UI (MUI)
 - **Routing**: React Router 7
 - **Styling**: Emotion (CSS-in-JS)
+- **Excel Export Engine**: ExcelJS (lazy-loaded)
 - **Code Quality**: ESLint
 - **Icons**: Material-UI Icons, SVG Assets
 
@@ -71,6 +72,7 @@ frontend/
 │   │   ├── mockApplications.js
 │   │   ├── mockCompanies.js
 │   │   └── mockTags.js
+│   ├── routes/                 # Route composition and lazy-loaded page wiring
 │   ├── types/                  # Type definitions
 │   ├── assets/                 # SVG icons and images
 │   ├── App.jsx                 # Root component
@@ -152,6 +154,11 @@ Data structure is ready for backend integration:
 - Tag-based categorization system
 
 > Note: Data resets on refresh because there is no API/storage layer connected yet.
+
+## ⚡ Performance Notes
+
+- Route pages are loaded with `React.lazy` + `Suspense` via `src/routes/AppRoutes.jsx` to reduce initial bundle cost.
+- Excel export is loaded on demand from `src/components/layout/ViewToggleBar.jsx` so `exceljs` is not part of the initial page payload.
 
 ## 🧪 Testing and Validation
 
