@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Layout from './components/layout/Layout';
-import JobApplications from './pages/JobApplications';
-import Resumes from './pages/Resumes';
-import Subscriptions from './pages/Subscriptions';
-import Archive from './pages/Archive';
-import Settings from './pages/Settings';
 import { mockApplications } from './data/mockApplications.js';
+
+const JobApplications = lazy(() => import('./pages/JobApplications'));
+const Resumes = lazy(() => import('./pages/Resumes'));
+const Subscriptions = lazy(() => import('./pages/Subscriptions'));
+const Archive = lazy(() => import('./pages/Archive'));
+const Settings = lazy(() => import('./pages/Settings'));
 
 function App({ isDarkMode, onToggleTheme }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -76,6 +77,8 @@ function App({ isDarkMode, onToggleTheme }) {
     )));
   };
 
+  const routeFallback = <div style={{ padding: 16 }}>Loading...</div>;
+
   return (
     <Router>
       <Routes>
@@ -93,30 +96,55 @@ function App({ isDarkMode, onToggleTheme }) {
           <Route
             index
             element={(
-              <JobApplications
-                apps={apps}
-                setApps={setApps}
-                onDeleteApplication={handleDeleteApplication}
-                searchQuery={searchQuery}
-                isLoading={isLoading}
-              />
+              <Suspense fallback={routeFallback}>
+                <JobApplications
+                  apps={apps}
+                  setApps={setApps}
+                  onDeleteApplication={handleDeleteApplication}
+                  searchQuery={searchQuery}
+                  isLoading={isLoading}
+                />
+              </Suspense>
             )}
           />
-          <Route path="resumes" element={<Resumes />} />
-          <Route path="subscriptions" element={<Subscriptions />} />
+          <Route
+            path="resumes"
+            element={(
+              <Suspense fallback={routeFallback}>
+                <Resumes />
+              </Suspense>
+            )}
+          />
+          <Route
+            path="subscriptions"
+            element={(
+              <Suspense fallback={routeFallback}>
+                <Subscriptions />
+              </Suspense>
+            )}
+          />
           <Route
             path="archive"
             element={(
-              <Archive
-                apps={apps}
-                deletedApps={deletedApps}
-                onRestoreDeleted={handleRestoreDeleted}
-                onRemoveDeleted={handleRemoveDeleted}
-                onRestoreRejected={handleRestoreRejected}
-              />
+              <Suspense fallback={routeFallback}>
+                <Archive
+                  apps={apps}
+                  deletedApps={deletedApps}
+                  onRestoreDeleted={handleRestoreDeleted}
+                  onRemoveDeleted={handleRemoveDeleted}
+                  onRestoreRejected={handleRestoreRejected}
+                />
+              </Suspense>
             )}
           />
-          <Route path="settings" element={<Settings />} />
+          <Route
+            path="settings"
+            element={(
+              <Suspense fallback={routeFallback}>
+                <Settings />
+              </Suspense>
+            )}
+          />
         </Route>
       </Routes>
     </Router>
