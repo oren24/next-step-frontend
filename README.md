@@ -205,11 +205,25 @@ When submitting a pull request:
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add YourFeature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
+Use this PR flow when contributing changes:
+
+1. Fork the repository and clone your fork locally.
+2. Create a feature branch from `master`:
+   `git checkout -b feature/your-feature-name`
+3. Make your changes and run checks:
+   `npm run lint`
+   `npm run build`
+4. Commit with a clear message:
+   `git commit -m "feat: short description of change"`
+5. Push your branch:
+   `git push origin feature/your-feature-name`
+6. Open a PR from your branch into `master` on GitHub.
+7. In the PR description, include:
+   - what changed
+   - why the change was made
+   - validation steps/results (for example lint/build)
+   - screenshots for UI changes
+8. Address review comments, push follow-up commits, and wait for approval.
 
 ## 📄 License
 
