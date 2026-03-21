@@ -18,7 +18,7 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
     if (format === 'xlsx') {
       try {
         const { exportApplicationsToXLSX } = await import('../exporters/xlsxExporter.js');
-        exportApplicationsToXLSX(applications);
+        await exportApplicationsToXLSX(applications);
       } catch (error) {
         console.error('Failed to load Excel exporter:', error);
       }
