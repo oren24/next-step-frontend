@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Box, Button, Menu, MenuItem, Typography, useTheme } from '@mui/material';
 import { exportApplicationsToCSV } from '../exporters/csvExporter.js';
 
-const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
+const ViewToggleBar = ({ currentView, onViewChange, applications = [], onNotify }) => {
   const theme = useTheme();
   const [exportMenuAnchor, setExportMenuAnchor] = React.useState(null);
 
@@ -15,15 +16,24 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
   };
 
   const handleExport = async (format) => {
+    if (applications.length === 0) {
+      onNotify?.({ message: 'No applications to export', severity: 'warning' });
+      handleCloseExportMenu();
+      return;
+    }
+
     if (format === 'xlsx') {
       try {
         const { exportApplicationsToXLSX } = await import('../exporters/xlsxExporter.js');
         await exportApplicationsToXLSX(applications);
+        onNotify?.({ message: 'Exported applications to Excel', severity: 'success' });
       } catch (error) {
         console.error('Failed to load Excel exporter:', error);
+        onNotify?.({ message: 'Excel export failed', severity: 'error' });
       }
     } else {
       exportApplicationsToCSV(applications);
+      onNotify?.({ message: 'Exported applications to CSV', severity: 'success' });
     }
     handleCloseExportMenu();
   };
@@ -202,6 +212,13 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [] }) => {
       </Menu>
     </Box>
   );
+};
+
+ViewToggleBar.propTypes = {
+  currentView: PropTypes.oneOf(['list', 'kanban']).isRequired,
+  onViewChange: PropTypes.func.isRequired,
+  applications: PropTypes.array,
+  onNotify: PropTypes.func,
 };
 
 export default ViewToggleBar;
