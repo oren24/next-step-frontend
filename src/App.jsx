@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import './App.css';
 import { mockApplications } from './data/mockApplications.js';
 import AppRoutes from './routes/AppRoutes.jsx';
 import GlobalToast from './components/layout/GlobalToast.jsx';
+import { useAuth } from './auth/useAuth.js';
 
 const getNowIso = () => new Date().toISOString();
 
@@ -26,6 +28,7 @@ const buildRestoredApp = (app) => ({
 });
 
 function App({ isDarkMode, onToggleTheme }) {
+  const { toolpadAuthentication, toolpadSession } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [apps, setApps] = useState(() => mockApplications.map((app) => ({ ...app })));
   const [deletedApps, setDeletedApps] = useState([]);
@@ -117,27 +120,31 @@ function App({ isDarkMode, onToggleTheme }) {
 
   return (
     <Router>
-      <AppRoutes
-        isDarkMode={isDarkMode}
-        onToggleTheme={onToggleTheme}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        apps={apps}
-        setApps={setApps}
-        deletedApps={deletedApps}
-        onDeleteApplication={handleDeleteApplication}
-        onRestoreDeleted={handleRestoreDeleted}
-        onRemoveDeleted={handleRemoveDeleted}
-        onRestoreRejected={handleRestoreRejected}
-        isLoading={isLoading}
-        onNotify={showToast}
-      />
-      <GlobalToast
-        open={toast.open}
-        message={toast.message}
-        severity={toast.severity}
-        onClose={closeToast}
-      />
+      <AuthenticationContext.Provider value={toolpadAuthentication}>
+        <SessionContext.Provider value={toolpadSession}>
+          <AppRoutes
+            isDarkMode={isDarkMode}
+            onToggleTheme={onToggleTheme}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            apps={apps}
+            setApps={setApps}
+            deletedApps={deletedApps}
+            onDeleteApplication={handleDeleteApplication}
+            onRestoreDeleted={handleRestoreDeleted}
+            onRemoveDeleted={handleRemoveDeleted}
+            onRestoreRejected={handleRestoreRejected}
+            isLoading={isLoading}
+            onNotify={showToast}
+          />
+          <GlobalToast
+            open={toast.open}
+            message={toast.message}
+            severity={toast.severity}
+            onClose={closeToast}
+          />
+        </SessionContext.Provider>
+      </AuthenticationContext.Provider>
     </Router>
   );
 }

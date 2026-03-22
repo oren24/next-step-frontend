@@ -1,5 +1,7 @@
+import PropTypes from 'prop-types';
 import { AppBar, Toolbar, Typography, IconButton, Box, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import { Account } from '@toolpad/core/Account';
 import { DRAWER_WIDTH, DRAWER_WIDTH_COLLAPSED } from './styles/sidebarStyles';
 import {
   getAppBarStyle,
@@ -11,18 +13,19 @@ import {
 import {
   ThemeToggle,
   SearchBar,
-  UserAvatar,
 } from './TopBarUtils';
 
-export default function TopBar({
-  onMenuClick,
-  isDarkMode,
-  onToggleTheme,
-  pageTitle,
-  sidebarCollapsed,
-  searchQuery,
-  onSearchChange,
-}) {
+function TopBar(props) {
+  const {
+    onMenuClick,
+    isDarkMode,
+    onToggleTheme,
+    pageTitle,
+    sidebarCollapsed,
+    searchQuery,
+    onSearchChange,
+  } = props;
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const drawerWidth = sidebarCollapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
@@ -51,10 +54,23 @@ export default function TopBar({
         {/* Right Section */}
         <Box sx={getRightSectionStyle()}>
           <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
-          <SearchBar theme={theme} value={searchQuery} onChange={onSearchChange} />
-          <UserAvatar />
+          <SearchBar value={searchQuery} onChange={onSearchChange} />
+          <Account slotProps={{ signOutButton: { color: 'inherit' } }} />
         </Box>
       </Toolbar>
     </AppBar>
   );
 }
+
+TopBar.propTypes = {
+  onMenuClick: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+  onToggleTheme: PropTypes.func.isRequired,
+  pageTitle: PropTypes.string.isRequired,
+  sidebarCollapsed: PropTypes.bool.isRequired,
+  searchQuery: PropTypes.string.isRequired,
+  onSearchChange: PropTypes.func.isRequired,
+};
+
+export default TopBar;
+
