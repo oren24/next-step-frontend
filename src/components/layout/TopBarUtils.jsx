@@ -1,4 +1,5 @@
-import { Box, IconButton, InputBase, Avatar, Typography } from '@mui/material';
+import PropTypes from 'prop-types';
+import { Box, IconButton, InputBase, Avatar, Typography, useTheme } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,7 +9,7 @@ import { DIMENSIONS, TYPOGRAPHY } from './styles/topBarStyles';
 // ==================== COMPONENTS ====================
 
 // Theme Toggle Component
-export function ThemeToggle({ isDarkMode, onToggle }) {
+const ThemeToggle = ({ isDarkMode, onToggle }) => {
   return (
     <IconButton
       onClick={onToggle}
@@ -22,10 +23,12 @@ export function ThemeToggle({ isDarkMode, onToggle }) {
       {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
     </IconButton>
   );
-}
+};
 
 // Search Bar Component
-export function SearchBar({ placeholder = 'Search..', theme, value = '', onChange }) {
+const SearchBar = ({ placeholder = 'Search..', value = '', onChange }) => {
+  const muiTheme = useTheme();
+
   return (
     <Box sx={{
       position: 'relative',
@@ -36,7 +39,7 @@ export function SearchBar({ placeholder = 'Search..', theme, value = '', onChang
       border: '1px solid',
       borderColor: 'divider',
       '&:hover': { borderColor: 'primary.main' },
-      '&:focus-within': { borderColor: 'primary.main', boxShadow: `0 0 0 2px ${theme.palette.primary.main}20` },
+      '&:focus-within': { borderColor: 'primary.main', boxShadow: `0 0 0 2px ${muiTheme.palette.primary.main}20` },
       transition: 'all 0.2s ease-in-out',
     }}>
       <Box sx={{
@@ -61,8 +64,8 @@ export function SearchBar({ placeholder = 'Search..', theme, value = '', onChang
           width: '100%',
           height: '100%',
           '& .MuiInputBase-input': {
-            padding: theme.spacing(0.75, 1, 0.75, 0),
-            paddingLeft: `calc(1em + ${theme.spacing(3.5)})`,
+            padding: muiTheme.spacing(0.75, 1, 0.75, 0),
+            paddingLeft: `calc(1em + ${muiTheme.spacing(3.5)})`,
             height: '100%',
             fontSize: '0.85rem',
             '&::placeholder': {
@@ -74,20 +77,31 @@ export function SearchBar({ placeholder = 'Search..', theme, value = '', onChang
       />
     </Box>
   );
-}
+};
 
 // User Avatar Component
-export function UserAvatar({ userName = 'My Name', avatarLetter = 'U' }) {
+const UserAvatar = ({ userName = 'My Name', avatarLetter = 'U', onClick, isExpanded = false }) => {
   return (
-    <Box sx={{
+    <Box
+      component="button"
+      type="button"
+      onClick={onClick}
+      aria-haspopup="menu"
+      aria-expanded={isExpanded}
+      sx={{
       width: DIMENSIONS.avatar.containerWidth,
       height: DIMENSIONS.avatar.containerHeight,
       display: 'flex',
       alignItems: 'center',
       gap: '9px',
       cursor: 'pointer',
+      border: 'none',
+      background: 'transparent',
+      padding: 0,
       '&:hover': { opacity: 0.8 },
-    }}>
+      '&:focus': { outline: 'none' },
+    }}
+    >
       <Avatar sx={{
         width: DIMENSIONS.avatar.size,
         height: DIMENSIONS.avatar.size,
@@ -115,4 +129,29 @@ export function UserAvatar({ userName = 'My Name', avatarLetter = 'U' }) {
       </Box>
     </Box>
   );
-}
+};
+
+ThemeToggle.propTypes = {
+  isDarkMode: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
+};
+
+SearchBar.propTypes = {
+  placeholder: PropTypes.string,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+};
+
+UserAvatar.propTypes = {
+  userName: PropTypes.string,
+  avatarLetter: PropTypes.string,
+  onClick: PropTypes.func,
+  isExpanded: PropTypes.bool,
+};
+
+export {
+  ThemeToggle,
+  SearchBar,
+  UserAvatar,
+};
+

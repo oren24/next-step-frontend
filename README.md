@@ -112,6 +112,22 @@ frontend/
    npm run preview
    ```
 
+5. **(Optional) Enable real Google sign-in popup**
+   Create a `.env.local` file in the project root:
+   ```bash
+   VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+   ```
+   In Google Cloud Console, set JavaScript origin to `http://localhost:5173` for your OAuth client.
+
+### Demo account (quick login)
+
+If you just want to explore the app, use the seeded demo credentials on `http://localhost:5173/auth/sign-in`:
+
+- **Email:** `demo@nextstep.local`
+- **Password:** `Demo@1234`
+
+You can also create your own account at `http://localhost:5173/auth/sign-up`.
+
 ## 📊 Usage
 
 ### Managing Applications
@@ -147,6 +163,11 @@ Toggle between light and dark mode using the theme button in the top bar. The ap
 ## 🔐 Data Management
 
 This frontend currently uses mock data for development. `apps` state is initialized from `src/data/mockApplications.js` and updated in-memory from `src/App.jsx` (no backend persistence in this repository).
+
+Authentication is frontend-only in this demo build and is stored in browser storage:
+- account records in `localStorage`
+- active session in `localStorage` (remember-me) or `sessionStorage` (non-remember)
+- seeded demo account is re-added on app startup when missing
 
 Data structure is ready for backend integration:
 - JobApplication type with comprehensive fields

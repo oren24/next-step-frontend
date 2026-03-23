@@ -2,12 +2,15 @@ import { Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { Route, Routes } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute.jsx';
 
 const JobApplications = lazy(() => import('../pages/JobApplications'));
 const Resumes = lazy(() => import('../pages/Resumes'));
 const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 const Archive = lazy(() => import('../pages/Archive'));
 const Settings = lazy(() => import('../pages/Settings'));
+const SignIn = lazy(() => import('../pages/auth/SignIn'));
+const SignUp = lazy(() => import('../pages/auth/SignUp'));
 
 const withRouteFallback = (element) => (
   <Suspense fallback={<div style={{ padding: 16 }}>Loading...</div>}>
@@ -33,14 +36,32 @@ export default function AppRoutes({
   return (
     <Routes>
       <Route
+        path="/auth/sign-in"
+        element={withRouteFallback(
+          <PublicOnlyRoute>
+            <SignIn isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
+          </PublicOnlyRoute>
+        )}
+      />
+      <Route
+        path="/auth/sign-up"
+        element={withRouteFallback(
+          <PublicOnlyRoute>
+            <SignUp isDarkMode={isDarkMode} onToggleTheme={onToggleTheme} />
+          </PublicOnlyRoute>
+        )}
+      />
+      <Route
         path="/"
         element={(
-          <Layout
-            isDarkMode={isDarkMode}
-            onToggleTheme={onToggleTheme}
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-          />
+          <ProtectedRoute>
+            <Layout
+              isDarkMode={isDarkMode}
+              onToggleTheme={onToggleTheme}
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+            />
+          </ProtectedRoute>
         )}
       >
         <Route
