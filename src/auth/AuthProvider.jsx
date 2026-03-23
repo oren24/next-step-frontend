@@ -18,6 +18,7 @@ const sanitizeUser = (user) => {
     id: user.id,
     name: user.name,
     email: user.email,
+    photoUrl: user.photoUrl || null,
     createdAt: user.createdAt,
   };
 };
@@ -30,17 +31,25 @@ const createUserId = () => {
   return `user_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 };
 
-const buildUser = ({ name, email, authProvider = 'credentials', passwordHash = null }) => ({
+const buildUser = ({
+  name,
+  email,
+  authProvider = 'credentials',
+  passwordHash = null,
+  photoUrl = null,
+}) => ({
   id: createUserId(),
   name: name.trim(),
   email: email.trim().toLowerCase(),
   authProvider,
   passwordHash,
+  photoUrl,
   createdAt: new Date().toISOString(),
 });
 
 const SOCIAL_PROVIDER_LABELS = {
   linkedin: 'LinkedIn',
+  google: 'Google',
 };
 
 const DEMO_USER_EMAIL = 'demo@nextstep.local';
@@ -77,7 +86,7 @@ const buildToolpadSession = (user) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      image: null,
+      image: user.photoUrl || null,
     },
   };
 };
@@ -217,7 +226,7 @@ export function AuthProvider({ children }) {
     return nextSession.user;
   }, [users]);
 
-  const signInWithProvider = useCallback(async ({ provider, remember = true }) => {
+  const signInWithProvider = useCallback(async ({ provider, remember = true, profile = null }) => {
     const normalizedProvider = String(provider || '').trim().toLowerCase();
     const providerLabel = SOCIAL_PROVIDER_LABELS[normalizedProvider];
 
@@ -225,20 +234,41 @@ export function AuthProvider({ children }) {
       throw new Error(`${provider} sign-in is not configured yet in this frontend-only build.`);
     }
 
-    const providerEmail = `${normalizedProvider}.demo@nextstep.local`;
+    const providerEmail = String(
+      profile?.email || `${normalizedProvider}.demo@nextstep.local`
+    ).trim().toLowerCase();
+    const providerName = String(profile?.name || `${providerLabel} User`).trim() || `${providerLabel} User`;
+    const providerPhotoUrl = String(profile?.picture || '').trim() || null;
     let providerUser = users.find((candidate) => candidate.email === providerEmail);
+
+    if (providerUser && providerUser.authProvider && providerUser.authProvider !== normalizedProvider) {
+      throw new Error(`This email is already connected to ${providerUser.authProvider} sign-in.`);
+    }
 
     let nextUsers = users;
     if (!providerUser) {
-      const providerPasswordHash = await hashPassword(`oauth_${normalizedProvider}`);
       providerUser = buildUser({
-        name: `${providerLabel} User`,
+        name: providerName,
         email: providerEmail,
         authProvider: normalizedProvider,
-        passwordHash: providerPasswordHash,
+        passwordHash: null,
+        photoUrl: providerPhotoUrl,
       });
       nextUsers = [...users, providerUser];
       persistUsersState({ nextUsers, setUsers });
+    } else if (providerUser.name !== providerName || providerUser.photoUrl !== providerPhotoUrl) {
+      const matchedIndex = users.findIndex((candidate) => candidate.id === providerUser.id);
+      if (matchedIndex >= 0) {
+        const refreshedProviderUser = {
+          ...providerUser,
+          name: providerName,
+          photoUrl: providerPhotoUrl,
+        };
+        nextUsers = [...users];
+        nextUsers[matchedIndex] = refreshedProviderUser;
+        providerUser = refreshedProviderUser;
+        persistUsersState({ nextUsers, setUsers });
+      }
     }
 
     const nextSession = buildSession(providerUser);

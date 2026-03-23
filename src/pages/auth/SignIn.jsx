@@ -3,6 +3,7 @@ import { Box, Link, Typography } from '@mui/material';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { useAuth } from '../../auth/useAuth.js';
+import { signInWithGooglePopup } from '../../auth/googleAuth.js';
 import { ThemeToggle } from '../../components/layout/TopBarUtils.jsx';
 
 function SignUpPromptLink() {
@@ -20,6 +21,7 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, signInWithProvider } = useAuth();
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   const redirectPath = location.state?.from?.pathname || '/';
 
@@ -52,6 +54,17 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
         return {};
       } catch (error) {
         return { error: error.message || 'Unable to sign in with LinkedIn.' };
+      }
+    }
+
+    if (provider.id === 'google') {
+      try {
+        const googleProfile = await signInWithGooglePopup({ clientId: googleClientId });
+        await signInWithProvider({ provider: 'google', remember: true, profile: googleProfile });
+        navigate(redirectPath, { replace: true });
+        return {};
+      } catch (error) {
+        return { error: error.message || 'Unable to sign in with Google.' };
       }
     }
 

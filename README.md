@@ -112,6 +112,13 @@ frontend/
    npm run preview
    ```
 
+5. **(Optional) Enable real Google sign-in popup**
+   Create a `.env.local` file in the project root:
+   ```bash
+   VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+   ```
+   In Google Cloud Console, set JavaScript origin to `http://localhost:5173` for your OAuth client.
+
 ### Demo account (quick login)
 
 If you just want to explore the app, use the seeded demo credentials on `http://localhost:5173/auth/sign-in`:
