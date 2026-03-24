@@ -331,8 +331,8 @@ export default function JobApplications({
 
   // Use pointer & touch sensors with a small activation constraint for a native feel
   const sensors = useSensors(
-    useSensor(PointerSensor, {activationConstraint: {distance: 5}}),
-    useSensor(TouchSensor, {activationConstraint: {delay: 150, tolerance: 5}})
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 5 } })
   );
 
   const updateAppStatus = (appId, newStatus) => {
@@ -442,6 +442,10 @@ export default function JobApplications({
     setActiveId(event.active?.id ?? null);
   };
 
+  const handleDragCancel = () => {
+    setActiveId(null);
+  };
+
   // Helper to find the active item object for the overlay
   const activeItem = activeId ? apps.find((a) => a.id === activeId) : null;
 
@@ -490,14 +494,14 @@ export default function JobApplications({
         isLoading ? (
           <BoardSkeleton />
         ) : (
-          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <DndContext sensors={sensors} onDragStart={handleDragStart} onDragCancel={handleDragCancel} onDragEnd={handleDragEnd}>
             <Box sx={BOARD.columnsWrapper}>
               {STATUS_ORDER.map((status) => (
                 <Column key={status} status={status} appsInColumn={columns[status] || []} updateAppStatus={updateAppStatus} onDelete={handleDeleteApplication} onEdit={handleOpenJobDrawer} onShare={handleShareApplication} onAdd={handleAddApplication}/>
               ))}
             </Box>
 
-            <DragOverlay dropAnimation={{duration: 150, easing: 'ease'}}>
+            <DragOverlay dropAnimation={{ duration: 120, easing: 'ease' }}>
               {renderDragOverlay()}
             </DragOverlay>
           </DndContext>
