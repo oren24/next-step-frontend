@@ -29,7 +29,7 @@ const formatDate = (value) => {
 
 export const getAppliedDate = (app) => {
   if (!app) return '-';
-  return formatDate(app.appliedAt || app.createdAt || app.updatedAt);
+  return formatDate(app.appliedDate || app.appliedAt || app.createdAt || app.updatedAt);
 };
 
 export const getCreatedDate = (app) => {

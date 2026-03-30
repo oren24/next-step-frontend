@@ -39,6 +39,8 @@ function JobDrawerBody({app, onClose, onSaveNote, onSaveInterviewStatus, onSaveE
 
   const handleSaveEdit = () => {
     if (!app || !onSaveEdit) return;
+    const nextJobTitle = editFormData.position.trim();
+    const nextCompanyName = editFormData.company.trim();
     const tagsArray = editFormData.tags
       .split(',')
       .map((t) => t.trim())
@@ -46,8 +48,11 @@ function JobDrawerBody({app, onClose, onSaveNote, onSaveInterviewStatus, onSaveE
 
     const updatedApp = {
       ...app,
-      position: editFormData.position,
-      company: editFormData.company,
+      // Keep canonical + legacy aliases in sync until legacy reads are removed.
+      jobTitle: nextJobTitle,
+      position: nextJobTitle,
+      companyName: nextCompanyName,
+      company: nextCompanyName,
       location: editFormData.location,
       workType: editFormData.workType,
       jobUrl: editFormData.jobUrl,

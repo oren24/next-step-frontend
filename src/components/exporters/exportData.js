@@ -6,7 +6,7 @@ export const EXPORT_COLUMNS = {
   workType: 'Work Type',
   status: 'Status',
   tags: 'Tags',
-  createdAt: 'Applied Date',
+  appliedDate: 'Applied Date',
   platform: 'Platform',
   notes: 'Notes',
   nextInterviewDate: 'Next Interview',
@@ -34,7 +34,9 @@ export const mapApplicationToExportRow = (app) => {
 
     if (key === 'tags' && Array.isArray(value)) {
       value = value.join('; ');
-    } else if (key === 'createdAt' || key === 'nextInterviewDate' || key === 'answerDeadline') {
+    } else if (key === 'appliedDate') {
+      value = formatExportDate(value || app.createdAt);
+    } else if (key === 'nextInterviewDate' || key === 'answerDeadline') {
       value = formatExportDate(value);
     } else if (key === 'offerAmount' && value) {
       value = `${value} ${app.offerCurrency || 'USD'}`;

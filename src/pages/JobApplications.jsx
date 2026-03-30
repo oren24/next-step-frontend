@@ -378,8 +378,16 @@ export default function JobApplications({
 
   const handleSaveNote = (appId, note) => {
     const now = getNowIso();
-    setApps((prev) => prev.map((item) => (item.id === appId ? {...item, note, updatedAt: now} : item)));
-    setSelectedApp((prev) => (prev && prev.id === appId ? {...prev, note, updatedAt: now} : prev));
+    setApps((prev) => prev.map((item) => (
+      item.id === appId
+        ? {...item, note, notes: note, updatedAt: now}
+        : item
+    )));
+    setSelectedApp((prev) => (
+      prev && prev.id === appId
+        ? {...prev, note, notes: note, updatedAt: now}
+        : prev
+    ));
   };
 
   const handleSaveInterviewStatus = (appId) => {
@@ -398,7 +406,9 @@ export default function JobApplications({
 
   const handleSaveEdit = (updatedApp) => {
     const now = getNowIso();
-    setApps((prev) => prev.map((item) => (item.id === updatedApp.id ? {...updatedApp, updatedAt: now} : item)));
+    const savedApp = { ...updatedApp, updatedAt: now };
+    setApps((prev) => prev.map((item) => (item.id === savedApp.id ? savedApp : item)));
+    setSelectedApp((prev) => (prev && prev.id === savedApp.id ? savedApp : prev));
     setIsDrawerOpen(false);
   };
 
@@ -417,8 +427,15 @@ export default function JobApplications({
       const [activeItem] = copy.splice(activeIndex, 1);
 
       if (STATUS_ORDER.includes(overId)) {
+        const oldStatus = activeItem.status;
         activeItem.status = overId;
         activeItem.updatedAt = getNowIso();
+        if (oldStatus !== overId) {
+          activeItem.statusHistory = [
+            ...(activeItem.statusHistory || []),
+            { status: overId, timestamp: activeItem.updatedAt },
+          ];
+        }
         const lastIndex = copy.reduce((acc, p, idx) => (p.status === overId ? idx : acc), -1);
         if (lastIndex === -1) copy.push(activeItem);
         else copy.splice(lastIndex + 1, 0, activeItem);
@@ -431,8 +448,16 @@ export default function JobApplications({
         return copy;
       }
 
-      activeItem.status = copy[overIndex].status;
+      const oldStatus = activeItem.status;
+      const nextStatus = copy[overIndex].status;
+      activeItem.status = nextStatus;
       activeItem.updatedAt = getNowIso();
+      if (oldStatus !== nextStatus) {
+        activeItem.statusHistory = [
+          ...(activeItem.statusHistory || []),
+          { status: nextStatus, timestamp: activeItem.updatedAt },
+        ];
+      }
       copy.splice(overIndex, 0, activeItem);
       return copy;
     });
