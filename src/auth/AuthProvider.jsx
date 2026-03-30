@@ -241,7 +241,7 @@ export function AuthProvider({ children }) {
     const providerPhotoUrl = String(profile?.picture || '').trim() || null;
     let providerUser = users.find((candidate) => candidate.email === providerEmail);
 
-    if (providerUser && providerUser.authProvider && providerUser.authProvider !== normalizedProvider) {
+    if (providerUser?.authProvider && providerUser.authProvider !== normalizedProvider) {
       throw new Error(`This email is already connected to ${providerUser.authProvider} sign-in.`);
     }
 
@@ -425,5 +425,4 @@ AuthProvider.propTypes = {
 };
 
 export default AuthContext;
-
 
