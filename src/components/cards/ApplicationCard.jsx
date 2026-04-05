@@ -3,18 +3,23 @@
  * @param {{app: import('../../../types/Types.js').JobApplication, status?: import('../../../types/Types.js').JobStatus, draggableProps?: object, dragHandleProps?: object, innerRef?: any, onDelete?: function, onEdit?: function, onShare?: function}} props
  */
 
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { Box, Card, CardContent, Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
 import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
-import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal';
-import EditApplicationModal from '../popapmodals/EditApplicationModal';
 
-export default function ApplicationCard({ app, status, draggableProps, dragHandleProps, innerRef, onDelete, onEdit, onShare }) {
+function ApplicationCard({
+  app,
+  status,
+  draggableProps,
+  dragHandleProps,
+  innerRef,
+  onOpen,
+  onEdit,
+  onRequestEdit,
+  onRequestDelete,
+  onShare,
+}) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
@@ -43,47 +48,19 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
   const handleDeleteClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setDeleteModalOpen(true);
-    setDropdownOpen(false);
-  };
-
-  const handleDeleteConfirm = async (applicationId) => {
-    setIsDeleting(true);
-    try {
-      if (onDelete) {
-        await onDelete(applicationId);
-      }
-    } finally {
-      setIsDeleting(false);
-      setDeleteModalOpen(false);
+    if (onRequestDelete) {
+      onRequestDelete(app);
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteModalOpen(false);
+    setDropdownOpen(false);
   };
 
   const handleEditClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setEditModalOpen(true);
-    setDropdownOpen(false);
-  };
-
-  const handleEditCancel = () => {
-    setEditModalOpen(false);
-  };
-
-  const handleEditSave = async (updatedApp) => {
-    setIsEditing(true);
-    try {
-      if (onEdit) {
-        await onEdit(updatedApp);
-      }
-    } finally {
-      setIsEditing(false);
-      setEditModalOpen(false);
+    if (onRequestEdit) {
+      onRequestEdit(app);
     }
+    setDropdownOpen(false);
   };
 
   const handleShareClick = async (e) => {
@@ -112,7 +89,7 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
           onClick={(e) => handleMenuClose(e)}
         />
       )}
-      
+
       <Card
         variant="outlined"
         sx={dropdownOpen ? {
@@ -128,7 +105,9 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
         {...(dropdownOpen ? {} : dragHandleProps)}
         onClick={(e) => {
           if (!dropdownOpen && !e.target.closest('button')) {
-            if (onEdit) {
+            if (onOpen) {
+              onOpen(app);
+            } else if (onEdit) {
               onEdit(app);
             }
           }
@@ -232,24 +211,6 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
           </Box>
         )}
 
-        {/* Delete Modal */}
-        <DeleteApplicationModal
-          open={deleteModalOpen}
-          onClose={handleDeleteCancel}
-          onConfirm={handleDeleteConfirm}
-          application={app}
-          isLoading={isDeleting}
-        />
-
-        {/* Edit Modal */}
-        <EditApplicationModal
-          open={editModalOpen}
-          onClose={handleEditCancel}
-          onSave={handleEditSave}
-          application={app}
-          isLoading={isEditing}
-        />
-
         <CardContent sx={CARD.content}>
           <Stack direction="row" sx={CARD.chipRow}>
             {(app.tags || []).slice(0, 5).map((t) => (
@@ -265,3 +226,20 @@ export default function ApplicationCard({ app, status, draggableProps, dragHandl
     </>
   );
 }
+
+export default memo(ApplicationCard, (prevProps, nextProps) => {
+  // Return true if props are equivalent (skip re-render)
+  // Only re-render if the app data or key callbacks changed
+  return (
+    prevProps.app === nextProps.app &&
+    prevProps.status === nextProps.status &&
+    prevProps.onOpen === nextProps.onOpen &&
+    prevProps.onRequestEdit === nextProps.onRequestEdit &&
+    prevProps.onRequestDelete === nextProps.onRequestDelete &&
+    prevProps.onShare === nextProps.onShare &&
+    prevProps.draggableProps === nextProps.draggableProps &&
+    prevProps.dragHandleProps === nextProps.dragHandleProps &&
+    prevProps.innerRef === nextProps.innerRef
+  );
+});
+

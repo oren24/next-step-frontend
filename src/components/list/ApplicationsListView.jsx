@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -18,7 +18,6 @@ import AddIcon from '@mui/icons-material/Add';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import AddApplicationModal from '../popapmodals/AddApplicationModal.jsx';
-import DeleteApplicationModal from '../popapmodals/DeleteApplicationModal.jsx';
 import { LIST } from '../../pages/styles/jobApplicationsStyles';
 import { JOB_STATUSES } from '../../constants/jobStatuses.js';
 import {
@@ -49,12 +48,17 @@ const APP_SHAPE = PropTypes.shape({
   updatedAt: PropTypes.string,
 });
 
-function ApplicationsListView({ apps, onAdd, onEdit, onDelete, onStatusChange, isLoading = false }) {
+function ApplicationsListView({
+  apps,
+  onAdd,
+  onEdit,
+  onRequestDelete,
+  onStatusChange,
+  isLoading = false,
+}) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [addOpen, setAddOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedApp, setSelectedApp] = useState(null);
   const [statusFilter, setStatusFilter] = useState(DEFAULT_STATUS_FILTER);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState(DEFAULT_SORT_BY);
@@ -77,91 +81,83 @@ function ApplicationsListView({ apps, onAdd, onEdit, onDelete, onStatusChange, i
     [rows, statusFilter]
   );
 
-  const handleOpenEdit = (app) => {
+  const handleOpenEdit = useCallback((app) => {
     if (onEdit) onEdit(app);
-  };
+  }, [onEdit]);
 
-  const handleOpenDelete = (app) => {
-    setSelectedApp(app);
-    setDeleteModalOpen(true);
-  };
+  const handleOpenDelete = useCallback((app) => {
+    if (onRequestDelete) {
+      onRequestDelete(app);
+    }
+  }, [onRequestDelete]);
 
-  const handleCloseDeleteModal = () => {
-    setDeleteModalOpen(false);
-    setSelectedApp(null);
-  };
-
-  const handleOpenAddModal = () => {
+  const handleOpenAddModal = useCallback(() => {
     setAddOpen(true);
-  };
+  }, []);
 
-  const handleCloseAddModal = () => {
+  const handleCloseAddModal = useCallback(() => {
     setAddOpen(false);
-  };
+  }, []);
 
-  const handleSaveApplication = (newApp) => {
+  const handleSaveApplication = useCallback((newApp) => {
     onAdd(newApp);
     setAddOpen(false);
-  };
+  }, [onAdd]);
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = useCallback((event) => {
     setSearchQuery(event.target.value);
-  };
+  }, []);
 
-  const handleStatusFilterChange = (event) => {
+  const handleStatusFilterChange = useCallback((event) => {
     setStatusFilter(event.target.value);
-  };
+  }, []);
 
-  const handleSortByChange = (event) => {
+  const handleSortByChange = useCallback((event) => {
     setSortBy(event.target.value);
-  };
+  }, []);
 
-  const handleSortDirectionChange = (event) => {
+  const handleSortDirectionChange = useCallback((event) => {
     setSortDirection(event.target.value);
-  };
+  }, []);
 
-  const handleDeleteConfirm = async () => {
-    if (!selectedApp || !onDelete) return;
-    await onDelete(selectedApp.id);
-    setDeleteModalOpen(false);
-    setSelectedApp(null);
-  };
-
-  const handleToggleSection = (status) => {
+  const handleToggleSection = useCallback((status) => {
     setCollapsedSections((prev) => ({ ...prev, [status]: !prev[status] }));
-  };
+  }, []);
 
-  const handleAutoExpandSection = (status) => {
+  const handleAutoExpandSection = useCallback((status) => {
     setCollapsedSections((prev) => {
       if (!prev[status]) return prev;
       return { ...prev, [status]: false };
     });
-  };
+  }, []);
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = useCallback((event) => {
     setActiveId(null);
     const appId = event.active?.id;
     const nextStatus = event.over?.id;
     const isValidDropStatus = JOB_STATUSES.includes(nextStatus);
     if (!appId || !nextStatus || !isValidDropStatus) return;
 
-    const activeApp = apps.find((app) => app.id === appId);
-    if (!activeApp || activeApp.status === nextStatus) return;
+    const draggedApp = apps.find((app) => app.id === appId);
+    if (!draggedApp || draggedApp.status === nextStatus) return;
     onStatusChange(appId, nextStatus);
-  };
+  }, [apps, onStatusChange]);
 
-  const handleDragStart = (event) => {
+  const handleDragStart = useCallback((event) => {
     setActiveId(event.active?.id ?? null);
-  };
+  }, []);
 
-  const handleDragCancel = () => {
+  const handleDragCancel = useCallback(() => {
     setActiveId(null);
-  };
+  }, []);
 
   const isDragging = activeId !== null;
-  const activeApp = activeId ? apps.find((app) => app.id === activeId) : null;
+  const activeApp = useMemo(
+    () => (activeId ? apps.find((app) => app.id === activeId) : null),
+    [activeId, apps]
+  );
 
-  const renderActiveDragOverlay = () => {
+  const renderActiveDragOverlay = useCallback(() => {
     if (!activeApp) return null;
 
     return (
@@ -177,7 +173,7 @@ function ApplicationsListView({ apps, onAdd, onEdit, onDelete, onStatusChange, i
         </Box>
       </Paper>
     );
-  };
+  }, [activeApp]);
 
   const renderLoadingSections = () => (
     <Box sx={LIST.sectionsStack}>
@@ -299,13 +295,6 @@ function ApplicationsListView({ apps, onAdd, onEdit, onDelete, onStatusChange, i
         onSave={handleSaveApplication}
         status={DEFAULT_NEW_APP_STATUS}
       />
-
-      <DeleteApplicationModal
-        open={deleteModalOpen}
-        onClose={handleCloseDeleteModal}
-        onConfirm={handleDeleteConfirm}
-        application={selectedApp}
-      />
     </Box>
   );
 }
@@ -314,7 +303,7 @@ ApplicationsListView.propTypes = {
   apps: PropTypes.arrayOf(APP_SHAPE).isRequired,
   onAdd: PropTypes.func.isRequired,
   onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
+  onRequestDelete: PropTypes.func,
   onStatusChange: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import ApplicationCard from './ApplicationCard.jsx';
 
@@ -6,8 +6,30 @@ import ApplicationCard from './ApplicationCard.jsx';
  * DraggableItem wraps an ApplicationCard with dnd-kit sortable behavior
  * @param {{app: import('../../../types/Types.js').JobApplication, leftStatus?: string, rightStatus?: string, updateAppStatus: function, onDelete?: function, onEdit?: function, onShare?: function, isFirst?: boolean, isLast?: boolean}} props
  */
-export default function DraggableItem({ app, leftStatus, rightStatus, updateAppStatus, onDelete, onEdit, onShare, isFirst = false, isLast = false }) {
+export default function DraggableItem({
+  app,
+  leftStatus,
+  rightStatus,
+  updateAppStatus,
+  onOpen,
+  onRequestEdit,
+  onRequestDelete,
+  onShare,
+  isFirst = false,
+  isLast = false,
+}) {
   const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({id: app.id});
+
+  const handleMoveLeft = useCallback(
+    (id) => updateAppStatus(id, leftStatus),
+    [leftStatus, updateAppStatus]
+  );
+
+  const handleMoveRight = useCallback(
+    (id) => updateAppStatus(id, rightStatus),
+    [rightStatus, updateAppStatus]
+  );
+
   const style = {
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition: isDragging ? undefined : transition,
@@ -21,10 +43,11 @@ export default function DraggableItem({ app, leftStatus, rightStatus, updateAppS
       <ApplicationCard
         app={app}
         status={app.status}
-        onMoveLeft={(id) => updateAppStatus(id, leftStatus)}
-        onMoveRight={(id) => updateAppStatus(id, rightStatus)}
-        onDelete={onDelete}
-        onEdit={onEdit}
+        onMoveLeft={handleMoveLeft}
+        onMoveRight={handleMoveRight}
+        onOpen={onOpen}
+        onRequestEdit={onRequestEdit}
+        onRequestDelete={onRequestDelete}
         onShare={onShare}
         isFirst={isFirst}
         isLast={isLast}

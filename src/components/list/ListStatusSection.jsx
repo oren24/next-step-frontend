@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -346,7 +346,7 @@ SectionContent.propTypes = {
   onStatusChange: PropTypes.func.isRequired,
 };
 
-export default function ListStatusSection({
+function ListStatusSection({
   status,
   items,
   isCollapsed,
@@ -425,3 +425,4 @@ ListStatusSection.propTypes = {
   onStatusChange: PropTypes.func.isRequired,
 };
 
+export default memo(ListStatusSection);
