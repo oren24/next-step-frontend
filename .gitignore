@@ -29,3 +29,6 @@ dist-ssr
 /AGENTS.md
 /.rigour
 
+# Rigour configuration (local only, not tracked)
+rigour.yml
+

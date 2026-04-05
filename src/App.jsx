@@ -8,8 +8,8 @@ import AppRoutes from './routes/AppRoutes.jsx';
 import GlobalToast from './components/layout/GlobalToast.jsx';
 import { useAuth } from './auth/useAuth.js';
 
+// Utility functions for app state management
 const getNowIso = () => new Date().toISOString();
-
 const findById = (items, id) => items.find((item) => item.id === id);
 
 const removeById = (items, id) => items.filter((item) => item.id !== id);
@@ -61,13 +61,15 @@ function App({ isDarkMode, onToggleTheme }) {
     };
   }, []);
 
+  const getAppLabel = (app) => app?.companyName || app?.company || 'Application';
+
   const handleDeleteApplication = (appId) => {
     const target = findById(apps, appId);
     if (target) {
       const archiveEntry = buildDeletedArchiveEntry(target);
       setDeletedApps((prev) => [archiveEntry, ...prev]);
       showToast({
-        message: `${target.companyName || target.company || 'Application'} moved to archive`,
+        message: `${getAppLabel(target)} moved to archive`,
         severity: 'warning',
       });
     }
@@ -80,13 +82,10 @@ function App({ isDarkMode, onToggleTheme }) {
 
     const restoredApp = buildRestoredApp(target);
     setDeletedApps((prev) => removeById(prev, appId));
-    setApps((prev) => {
-      if (prev.some((item) => item.id === appId)) return prev;
-      return [...prev, restoredApp];
-    });
+    setApps((prev) => (prev.some((item) => item.id === appId) ? prev : [...prev, restoredApp]));
 
     showToast({
-      message: `${target.companyName || target.company || 'Application'} restored`,
+      message: `${getAppLabel(target)} restored`,
       severity: 'success',
     });
   };
@@ -96,7 +95,7 @@ function App({ isDarkMode, onToggleTheme }) {
     setDeletedApps((prev) => removeById(prev, appId));
     if (target) {
       showToast({
-        message: `${target.companyName || target.company || 'Application'} removed permanently`,
+        message: `${getAppLabel(target)} removed permanently`,
         severity: 'error',
       });
     }
@@ -112,7 +111,7 @@ function App({ isDarkMode, onToggleTheme }) {
 
     if (target) {
       showToast({
-        message: `${target.companyName || target.company || 'Application'} moved to Applied`,
+        message: `${getAppLabel(target)} moved to Applied`,
         severity: 'success',
       });
     }

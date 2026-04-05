@@ -36,6 +36,12 @@ const settingRows = [
   },
 ];
 
+const validatePasswordInput = (password, confirmPassword) => {
+  if (password !== confirmPassword) return 'New passwords do not match.';
+  if (password.length < 8) return 'New password must be at least 8 characters.';
+  return null;
+};
+
 export default function Settings() {
   const navigate = useNavigate();
   const { user, updateProfile, changePassword, deleteAccount, signOut } = useAuth();
@@ -52,10 +58,9 @@ export default function Settings() {
   const hasMessage = Boolean(message.text);
   const canUpdateProfile = Boolean(profileName.trim() && profileEmail.trim());
 
-  const passwordMismatch = useMemo(() => {
-    if (!newPassword || !confirmNewPassword) return false;
-    return newPassword !== confirmNewPassword;
-  }, [newPassword, confirmNewPassword]);
+  const passwordMismatch = useMemo(() => (
+    newPassword && confirmNewPassword && newPassword !== confirmNewPassword
+  ), [newPassword, confirmNewPassword]);
 
   const handleProfileSave = async () => {
     setMessage({ type: 'success', text: '' });
@@ -69,14 +74,9 @@ export default function Settings() {
 
   const handlePasswordUpdate = async () => {
     setMessage({ type: 'success', text: '' });
-
-    if (passwordMismatch) {
-      setMessage({ type: 'error', text: 'New passwords do not match.' });
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setMessage({ type: 'error', text: 'New password must be at least 8 characters.' });
+    const validationError = validatePasswordInput(newPassword, confirmNewPassword);
+    if (validationError) {
+      setMessage({ type: 'error', text: validationError });
       return;
     }
 
