@@ -3,9 +3,17 @@
  * @param {{app: import('../../../types/Types.js').JobApplication, status?: import('../../../types/Types.js').JobStatus, draggableProps?: object, dragHandleProps?: object, innerRef?: any, onDelete?: function, onEdit?: function, onShare?: function}} props
  */
 
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Box, Card, CardContent, Avatar, Chip, Stack, Typography, useTheme } from '@mui/material';
-import { CARD, STATUS_GRADIENTS } from './styles/applicationCardStyles';
+import {
+  CARD,
+  STATUS_GRADIENTS,
+  ICON_SIZE_SMALL,
+  ICON_SIZE_MEDIUM,
+  MAX_TAGS,
+  DROPDOWN_Z_INDEX
+} from './styles/applicationCardStyles';
 
 function ApplicationCard({
   app,

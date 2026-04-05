@@ -1,11 +1,16 @@
 import { useCallback, useState } from 'react';
 import { PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { getCurrentTimestamp } from '../utils/statusHistoryUtils.js';
+import {
+  POINTER_ACTIVATION_DISTANCE,
+  TOUCH_ACTIVATION_DELAY,
+  TOUCH_ACTIVATION_TOLERANCE,
+} from '../constants/dragDropConstants.js';
 
 export const useDragAndDropSensors = () => {
   return useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: POINTER_ACTIVATION_DISTANCE } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: TOUCH_ACTIVATION_DELAY, tolerance: TOUCH_ACTIVATION_TOLERANCE } })
   );
 };
 

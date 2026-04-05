@@ -1,5 +1,11 @@
 import { GRADIENTS } from '../../layout/styles/sidebarStyles';
 
+// UI Constants
+export const ICON_SIZE_SMALL = 16;
+export const ICON_SIZE_MEDIUM = 24;
+export const MAX_TAGS = 5;
+export const DROPDOWN_Z_INDEX = 1000;
+
 // Status-specific gradient backgrounds for light and dark modes
 export const STATUS_GRADIENTS = {
   light: {
