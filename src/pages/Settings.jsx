@@ -139,15 +139,30 @@ export default function Settings() {
             fullWidth
           />
           <Box>
-            <Button
-              variant="contained"
-              onClick={handleProfileSave}
-              disabled={!canUpdateProfile}
-            >
-              Save Profile
-            </Button>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+              <Button
+                variant="contained"
+                onClick={handleProfileSave}
+                disabled={!canUpdateProfile}
+              >
+                Save Profile
+              </Button>
+              <Button variant="outlined" onClick={() => navigate('/profile')}>
+                Open Full Profile
+              </Button>
+            </Stack>
           </Box>
         </Stack>
+      </Paper>
+
+      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }}>
+        <Typography sx={{ fontWeight: 700, mb: 1.5 }}>Drafts</Typography>
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem', mb: 1.5 }}>
+          View all saved draft applications before submitting them.
+        </Typography>
+        <Button variant="outlined" onClick={() => navigate('/drafts')}>
+          Open Drafts
+        </Button>
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 2 }}>

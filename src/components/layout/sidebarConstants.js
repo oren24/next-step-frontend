@@ -2,12 +2,14 @@ import jobApplicationsIcon from '../../assets/side bar icons/WorkOutlineOutlined
 import resumesIcon from '../../assets/side bar icons/FileCopyOutlined.svg';
 import subscriptionsIcon from '../../assets/side bar icons/ph_sparkle.svg';
 import archiveIcon from '../../assets/side bar icons/material-symbols-light_archive-outline.svg';
+import draftsIcon from '../../assets/main section icons/material-symbols_bookmark-outline.svg';
 import settingsIcon from '../../assets/side bar icons/solar_settings-linear.svg';
 
 export const navigationItems = [
   { id: 'job-applications', label: 'Job Applications', path: '/', icon: jobApplicationsIcon },
   { id: 'resumes', label: 'Resumes', path: '/resumes', icon: resumesIcon },
   { id: 'subscriptions', label: 'Subscriptions', path: '/subscriptions', icon: subscriptionsIcon },
+  { id: 'drafts', label: 'Drafts', path: '/drafts', icon: draftsIcon },
   { id: 'archive', label: 'Archive', path: '/archive', icon: archiveIcon },
 ];
 

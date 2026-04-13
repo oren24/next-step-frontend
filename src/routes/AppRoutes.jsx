@@ -8,6 +8,8 @@ const JobApplications = lazy(() => import('../pages/JobApplications'));
 const Resumes = lazy(() => import('../pages/Resumes'));
 const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 const Archive = lazy(() => import('../pages/Archive'));
+const Drafts = lazy(() => import('../pages/Drafts'));
+const Profile = lazy(() => import('../pages/Profile'));
 const Settings = lazy(() => import('../pages/Settings'));
 const SignIn = lazy(() => import('../pages/auth/SignIn'));
 const SignUp = lazy(() => import('../pages/auth/SignUp'));
@@ -79,6 +81,7 @@ export default function AppRoutes({
         />
         <Route path="resumes" element={withRouteFallback(<Resumes />)} />
         <Route path="subscriptions" element={withRouteFallback(<Subscriptions />)} />
+        <Route path="drafts" element={withRouteFallback(<Drafts apps={apps} />)} />
         <Route
           path="archive"
           element={withRouteFallback(
@@ -91,6 +94,7 @@ export default function AppRoutes({
             />
           )}
         />
+        <Route path="profile" element={withRouteFallback(<Profile />)} />
         <Route path="settings" element={withRouteFallback(<Settings />)} />
       </Route>
     </Routes>

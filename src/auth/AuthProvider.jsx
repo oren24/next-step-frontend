@@ -12,6 +12,63 @@ import { hashPassword, verifyPassword } from './passwordCrypto.js';
 // Global auth context for entire app
 const AuthContext = createContext(null);
 
+const getDefaultProfile = () => ({
+  personal: {
+    phone: '',
+    location: '',
+    headline: '',
+    bio: '',
+  },
+  professional: {
+    currentCompany: '',
+    yearsOfExperience: '',
+    workType: '',
+    skills: [],
+    linkedinUrl: '',
+    portfolioUrl: '',
+  },
+});
+
+const toTrimmed = (value) => String(value ?? '').trim();
+
+const sanitizeProfile = (profile) => {
+  const defaults = getDefaultProfile();
+  const personal = profile?.personal || {};
+  const professional = profile?.professional || {};
+
+  return {
+    personal: {
+      ...defaults.personal,
+      phone: toTrimmed(personal.phone),
+      location: toTrimmed(personal.location),
+      headline: toTrimmed(personal.headline),
+      bio: toTrimmed(personal.bio),
+    },
+    professional: {
+      ...defaults.professional,
+      currentCompany: toTrimmed(professional.currentCompany),
+      yearsOfExperience: toTrimmed(professional.yearsOfExperience),
+      workType: toTrimmed(professional.workType),
+      skills: Array.isArray(professional.skills)
+        ? professional.skills.map((item) => toTrimmed(item)).filter(Boolean)
+        : [],
+      linkedinUrl: toTrimmed(professional.linkedinUrl),
+      portfolioUrl: toTrimmed(professional.portfolioUrl),
+    },
+  };
+};
+
+const mergeProfile = (currentProfile, nextProfilePatch) => sanitizeProfile({
+  personal: {
+    ...currentProfile?.personal,
+    ...nextProfilePatch?.personal,
+  },
+  professional: {
+    ...currentProfile?.professional,
+    ...nextProfilePatch?.professional,
+  },
+});
+
 // Remove sensitive fields from user object for safe exposure to UI
 const sanitizeUser = (user) => {
   if (!user) return null;
@@ -21,6 +78,7 @@ const sanitizeUser = (user) => {
     name: user.name,
     email: user.email,
     photoUrl: user.photoUrl || null,
+    profile: sanitizeProfile(user.profile),
     createdAt: user.createdAt,
   };
 };
@@ -41,6 +99,7 @@ const buildUser = ({
   authProvider = 'credentials',
   passwordHash = null,
   photoUrl = null,
+  profile = null,
 }) => ({
   id: createUserId(),
   name: name.trim(),
@@ -49,6 +108,7 @@ const buildUser = ({
   passwordHash,
   photoUrl,
   createdAt: new Date().toISOString(),
+  profile: sanitizeProfile(profile),
 });
 
 // Map provider names to display labels
@@ -312,12 +372,27 @@ export function AuthProvider({ children }) {
   }, [users]);
 
   // Update user profile (name and email)
-  const updateProfile = useCallback(async ({ name, email }) => {
+  const updateProfile = useCallback(async ({ name, email, profile } = {}) => {
     if (!session?.user) {
       throw new Error('You need to sign in first.');
     }
 
-    const nextEmail = email.trim().toLowerCase();
+    const currentUser = users.find((candidate) => candidate.id === session.user.id);
+    if (!currentUser) {
+      throw new Error('User record is unavailable. Please sign in again.');
+    }
+
+    const nextName = typeof name === 'string' ? name.trim() : currentUser.name;
+    const nextEmail = typeof email === 'string'
+      ? email.trim().toLowerCase()
+      : currentUser.email;
+    const nextProfile = profile
+      ? mergeProfile(currentUser.profile, profile)
+      : sanitizeProfile(currentUser.profile);
+
+    if (!nextName || !nextEmail) {
+      throw new Error('Name and email are required.');
+    }
 
     // Check if new email is already in use by another account
     const emailTaken = users.some((candidate) => (
@@ -333,8 +408,9 @@ export function AuthProvider({ children }) {
       if (candidate.id !== session.user.id) return candidate;
       return {
         ...candidate,
-        name: name.trim(),
+        name: nextName,
         email: nextEmail,
+        profile: nextProfile,
       };
     });
 

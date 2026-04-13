@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 import ViewToggleBar from '../components/layout/ViewToggleBar.jsx';
 import ApplicationsListView from '../components/list/ApplicationsListView.jsx';
 import JobDrawer from '../components/drawer/JobDrawer.jsx';
@@ -26,9 +27,15 @@ export default function JobApplications({
   isLoading = false,
   onNotify,
 }) {
+  const location = useLocation();
+  const draftIdFromNavigation = location.state?.openDraftId;
+  const initialDraftToOpen = draftIdFromNavigation
+    ? apps.find((app) => app.id === draftIdFromNavigation) || null
+    : null;
+
   const [currentView, setCurrentView] = useState('kanban');
-  const [selectedApp, setSelectedApp] = useState(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(initialDraftToOpen);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(Boolean(initialDraftToOpen));
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [modalApplication, setModalApplication] = useState(null);
