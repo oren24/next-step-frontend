@@ -3,29 +3,21 @@ import PropTypes from 'prop-types';
 import {
   Box,
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Skeleton,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import AddApplicationModal from '../popapmodals/AddApplicationModal.jsx';
 import { LIST } from '../../pages/styles/jobApplicationsStyles';
 import { JOB_STATUSES } from '../../constants/jobStatuses.js';
-import {
-  STATUS_FILTERS,
-  SORT_OPTIONS,
-} from './listView.constants';
 import { buildGroupedRows, buildRows } from './listView.utils';
 import ListStatusSection from './ListStatusSection.jsx';
+import ListFilterControls from './ListFilterControls.jsx';
+import ListActiveDragOverlay from './ListActiveDragOverlay.jsx';
 
 const DEFAULT_STATUS_FILTER = 'All';
 const DEFAULT_SORT_BY = 'updatedAt';
@@ -157,24 +149,6 @@ function ApplicationsListView({
     [activeId, apps]
   );
 
-  const renderActiveDragOverlay = useCallback(() => {
-    if (!activeApp) return null;
-
-    return (
-      <Paper sx={LIST.listDragOverlay}>
-        <DragIndicatorIcon fontSize="small" sx={{ color: 'text.secondary', flexShrink: 0 }} />
-        <Box>
-          <Typography sx={{ fontWeight: 700, fontSize: '14px', lineHeight: 1.2 }}>
-            {activeApp.companyName}
-          </Typography>
-          <Typography sx={{ fontSize: '12px', color: 'text.secondary' }}>
-            {activeApp.jobTitle}
-          </Typography>
-        </Box>
-      </Paper>
-    );
-  }, [activeApp]);
-
   const renderLoadingSections = () => (
     <Box sx={LIST.sectionsStack}>
       {Array.from({ length: 3 }).map((_, index) => (
@@ -198,61 +172,16 @@ function ApplicationsListView({
         </Button>
       </Box>
 
-      <Box sx={LIST.controlsRow}>
-        <TextField
-          size="small"
-          label="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Company, role, platform, tag"
-          sx={LIST.searchField}
-        />
-
-        <FormControl size="small" sx={LIST.filterControl}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            variant="outlined"
-            value={statusFilter}
-            label="Status"
-            onChange={handleStatusFilterChange}
-          >
-            {STATUS_FILTERS.map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl size="small" sx={LIST.filterControl}>
-          <InputLabel>Sort By</InputLabel>
-          <Select
-            variant="outlined"
-            value={sortBy}
-            label="Sort By"
-            onChange={handleSortByChange}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl size="small" sx={LIST.filterControl}>
-          <InputLabel>Order</InputLabel>
-          <Select
-            variant="outlined"
-            value={sortDirection}
-            label="Order"
-            onChange={handleSortDirectionChange}
-          >
-            <MenuItem value="desc">Descending</MenuItem>
-            <MenuItem value="asc">Ascending</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
+      <ListFilterControls
+        searchQuery={searchQuery}
+        statusFilter={statusFilter}
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSearchChange={handleSearchChange}
+        onStatusFilterChange={handleStatusFilterChange}
+        onSortByChange={handleSortByChange}
+        onSortDirectionChange={handleSortDirectionChange}
+      />
 
       {isLoading ? (
         renderLoadingSections()
@@ -284,7 +213,7 @@ function ApplicationsListView({
           </Box>
 
           <DragOverlay dropAnimation={{ duration: 120, easing: 'ease' }}>
-            {renderActiveDragOverlay()}
+            <ListActiveDragOverlay activeApp={activeApp} />
           </DragOverlay>
         </DndContext>
       )}
