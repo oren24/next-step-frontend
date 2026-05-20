@@ -80,6 +80,36 @@ export const deleteApplication = async (req, res, next) => {
   }
 };
 
+/**
+ * Get all companies
+ */
+export const getCompanies = async (req, res, next) => {
+  try {
+    const companies = await applicationService.getCompanies();
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: companies,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all tags
+ */
+export const getTags = async (req, res, next) => {
+  try {
+    const tags = await applicationService.getTags();
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: tags,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getApplications,
   getApplication,

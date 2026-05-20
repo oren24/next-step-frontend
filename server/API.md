@@ -129,6 +129,7 @@ GET /applications?status=interviewing&page=1&limit=10
     {
       "id": 1,
       "user_id": 1,
+      "company_logo": "https://example.com/logo.png",
       "company_name": "Tech Corp",
       "job_title": "Senior Developer",
       "job_url": "https://example.com/jobs/123",
@@ -162,6 +163,7 @@ Content-Type: application/json
 ```json
 {
   "company_name": "Tech Corp",
+  "company_logo": "https://example.com/logo.png",
   "job_title": "Senior Developer",
   "job_url": "https://example.com/jobs/123",
   "status": "applied",
@@ -177,6 +179,7 @@ Content-Type: application/json
   "data": {
     "id": 1,
     "user_id": 1,
+    "company_logo": "https://example.com/logo.png",
     "company_name": "Tech Corp",
     "job_title": "Senior Developer",
     "status": "applied",
@@ -201,6 +204,7 @@ Authorization: Bearer <token>
   "data": {
     "id": 1,
     "user_id": 1,
+    "company_logo": "https://example.com/logo.png",
     "company_name": "Tech Corp",
     "job_title": "Senior Developer",
     "job_url": "https://example.com/jobs/123",

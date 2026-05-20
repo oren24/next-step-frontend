@@ -14,6 +14,7 @@
  * @property {number} id - Application ID
  * @property {number} user_id - User ID (owner)
  * @property {string} company_name - Company name
+ * @property {string} [company_logo] - URL to company logo (optional)
  * @property {string} job_title - Job title
  * @property {string} [job_url] - URL to job posting
  * @property {string} status - Application status (wishlist|applied|interviewing|offer|rejected)

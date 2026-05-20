@@ -10,6 +10,18 @@ const router = express.Router();
 router.use(authenticateJWT);
 
 /**
+ * GET /api/applications/metadata/companies
+ * Get all companies
+ */
+router.get('/metadata/companies', applicationsController.getCompanies);
+
+/**
+ * GET /api/applications/metadata/tags
+ * Get all tags
+ */
+router.get('/metadata/tags', applicationsController.getTags);
+
+/**
  * GET /api/applications
  * Get all applications for user
  */

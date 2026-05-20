@@ -59,8 +59,15 @@ export const getApplication = async (applicationId, userId) => {
  */
 export const createApplication = async (userId, appData) => {
   // Validation
-  if (!appData.company_name || !appData.job_title) {
-    throw new ValidationError('Company name and job title are required');
+  const hasCompanyId = appData.company_id !== undefined && appData.company_id !== null;
+  const hasCompanyName = appData.company_name !== undefined && appData.company_name !== null;
+  
+  if (!hasCompanyId && !hasCompanyName) {
+    throw new ValidationError('Either company_id or company_name is required');
+  }
+  
+  if (!appData.job_title) {
+    throw new ValidationError('Job title is required');
   }
   
   if (appData.status && !isValidJobStatus(appData.status)) {
@@ -114,10 +121,28 @@ export const deleteApplication = async (applicationId, userId) => {
   return applicationsDal.deleteApplication(applicationId, userId);
 };
 
+/**
+ * Get all companies
+ * @returns {Promise<Array>} All companies
+ */
+export const getCompanies = async () => {
+  return applicationsDal.getAllCompanies();
+};
+
+/**
+ * Get all tags
+ * @returns {Promise<Array>} All tags
+ */
+export const getTags = async () => {
+  return applicationsDal.getAllTags();
+};
+
 export default {
   getApplications,
   getApplication,
   createApplication,
   updateApplication,
   deleteApplication,
+  getCompanies,
+  getTags,
 };
