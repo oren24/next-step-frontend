@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import './App.css';
 import { mockApplications } from './data/mockApplications.js';
+import { mockCompanies } from './data/mockCompanies.js';
 import AppRoutes from './routes/AppRoutes.jsx';
 import GlobalToast from './components/layout/GlobalToast.jsx';
 import { useAuth } from './auth/useAuth.js';
@@ -30,7 +31,10 @@ const buildRestoredApp = (app) => ({
 function App({ isDarkMode, onToggleTheme }) {
   const { toolpadAuthentication, toolpadSession } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [apps, setApps] = useState(() => mockApplications.map((app) => ({ ...app })));
+  const [apps, setApps] = useState(() => mockApplications.map((app) => {
+    const company = mockCompanies.find(c => c.name === app.companyName);
+    return { ...app, companyLogo: company?.companyLogo || app.companyLogo };
+  }));
   const [deletedApps, setDeletedApps] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState({

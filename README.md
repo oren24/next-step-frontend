@@ -11,6 +11,7 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/routes/AppRoutes.jsx
 ## ✨ Features
 
 ### Core Features
+
 - **Job Application Management** - Create, edit, delete, and organize job applications
 - **Multiple View Modes** - Toggle between List and Kanban board views
 - **Drag & Drop Support** - Easily move applications between statuses (Wishlist, Applied, Interviewing, Offer, Rejected)
@@ -19,6 +20,7 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/routes/AppRoutes.jsx
 - **Archive Workflow** - Review rejected and deleted jobs, then restore or remove entries
 
 ### Data Organization
+
 - **Tag System** - Organize applications with custom tags (Frontend, Backend, Full Stack, etc.)
 - **Location Tracking** - Filter by location (Remote, On-site, Hybrid)
 - **Work Type Management** - Track different employment types
@@ -27,11 +29,13 @@ Current app flow is `src/main.jsx` -> `src/App.jsx` -> `src/routes/AppRoutes.jsx
 - **Offer Management** - Track offer amounts, deadlines, and currency
 
 ### Export Functionality
+
 - **CSV and Excel Export** - Download all job applications as `.csv` or `.xlsx`
 - **Proper Formatting** - Handles special characters, dates, and arrays correctly
 - **Complete Data** - Exports all relevant fields including offer details and interview information
 
 ### UI/UX Features
+
 - **Dark Mode Support** - Toggle between light and dark themes
 - **Responsive Design** - Works seamlessly on desktop and mobile devices
 - **Global Search** - Top-bar search filters applications in both List and Kanban views
@@ -86,6 +90,7 @@ frontend/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (LTS recommended)
 - npm or yarn
 
@@ -131,6 +136,7 @@ You can also create your own account at `http://localhost:5173/auth/sign-up`.
 ## 📊 Usage
 
 ### Managing Applications
+
 1. Navigate to **Job Applications** from the sidebar
 2. Click **"+ Add Application"** to create a new entry
 3. Fill in company details, job title, location, and other information
@@ -138,21 +144,25 @@ You can also create your own account at `http://localhost:5173/auth/sign-up`.
 5. Click the **three-dot menu** on any card to edit or delete
 
 ### Exporting Data
+
 1. In the Job Applications page, click the **Export** button
 2. Select **Export CSV** or **Export Excel (.xlsx)**
 3. File format: `job-applications-YYYY-MM-DD.csv` or `job-applications-YYYY-MM-DD.xlsx`
 
 ### Archive and Restore
+
 1. Open **Archive** from the sidebar
 2. Review rejected and deleted applications
 3. Use **Move to Applied** for rejected jobs, or **Restore** for deleted jobs
 
 ### Organizing with Tags
+
 - Add custom tags to categorize positions (e.g., "Frontend", "React", "Senior")
 - Filter applications by tags using the search/filter bar
 - Easily identify skill-based opportunities
 
 ### Using Different Views
+
 - **List View**: Tabular view with all applications grouped by status
 - **Kanban View**: Board view with drag-and-drop functionality between status columns
 
@@ -165,11 +175,13 @@ Toggle between light and dark mode using the theme button in the top bar. The ap
 This frontend currently uses mock data for development. `apps` state is initialized from `src/data/mockApplications.js` and updated in-memory from `src/App.jsx` (no backend persistence in this repository).
 
 Authentication is frontend-only in this demo build and is stored in browser storage:
+
 - account records in `localStorage`
 - active session in `localStorage` (remember-me) or `sessionStorage` (non-remember)
 - seeded demo account is re-added on app startup when missing
 
 Data structure is ready for backend integration:
+
 - JobApplication type with comprehensive fields
 - Company information integration
 - Tag-based categorization system
@@ -179,6 +191,7 @@ Data structure is ready for backend integration:
 ## ⚡ Performance
 
 ### Built-in Optimizations
+
 - Route pages are loaded with `React.lazy` + `Suspense` via `src/routes/AppRoutes.jsx` to reduce initial bundle cost.
 - Excel export is loaded on demand from `src/components/layout/ViewToggleBar.jsx` so `exceljs` is not part of the initial page payload.
 
@@ -210,6 +223,7 @@ The following optimizations have been implemented for 2-3x faster performance:
 ## 🐛 Known Issues & Future Improvements
 
 ### Upcoming Features
+
 - [ ] JSON export functionality
 - [ ] Custom export column selection
 - [ ] Export success notifications
@@ -224,6 +238,7 @@ The following optimizations have been implemented for 2-3x faster performance:
 ## 🔄 Git Workflow
 
 ### Current Branches
+
 - The default branch is `master`.
 - To see active remote branches, run `git branch -r`.
 

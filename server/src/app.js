@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import 'express-async-errors';
+import path from 'path';
 import morganMiddleware from './middleware/logging.middleware.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.middleware.js';
 import { logger } from './config/logger.js';
@@ -13,7 +14,9 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // CORS configuration
 app.use(
@@ -37,6 +40,9 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // API Routes
 app.use('/api', routes);
