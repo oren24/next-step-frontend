@@ -26,7 +26,7 @@ export default function JobDrawerHeader({
         <Box sx={titleWrapSx}>
           <Box
             component="img"
-            src={app?.companyLogo || '/src/assets/logo.svg'}
+            src={app?.companyLogo || '/assets/logo.svg'}
             alt={app?.company || app?.companyName || 'Company logo'}
             sx={logoSx}
           />

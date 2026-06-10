@@ -1,29 +1,7 @@
 export const signInWithLinkedInPopup = async ({ clientId }) => {
-  const normalizedClientId = String(clientId || '').trim();
+  const normalizedClientId = String(clientId || import.meta.env.VITE_LINKEDIN_CLIENT_ID || '').trim();
   
   if (!normalizedClientId) {
-    const token = import.meta.env.VITE_LINKEDIN_TOKEN;
-    if (token) {
-      try {
-        const response = await fetch('/api/linkedin/v2/userinfo', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        if (response.ok) {
-          const profile = await response.json();
-          return {
-            id: profile.sub,
-            email: profile.email,
-            name: profile.name || `${profile.given_name} ${profile.family_name}`.trim(),
-            picture: profile.picture || 'https://cdn-icons-png.flaticon.com/512/174/174857.png',
-          };
-        }
-      } catch (err) {
-        console.warn('Failed to fetch LinkedIn profile with token', err);
-      }
-    }
-
     console.warn('LinkedIn sign-in is not configured. Missing VITE_LINKEDIN_CLIENT_ID. Falling back to mock authentication.');
     // Simulate network delay for the popup flow
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -86,20 +64,28 @@ export const signInWithLinkedInPopup = async ({ clientId }) => {
           if (code) {
             popup.close();
             
-            // In a real application, you would send this `code` to your backend:
-            // const response = await fetch('/api/auth/linkedin', { method: 'POST', body: JSON.stringify({ code }) });
-            // const profile = await response.json();
-            
-            // For now, we mock the backend token exchange process:
-            console.log('Received LinkedIn auth code:', code);
-            console.warn('Backend token exchange not implemented yet. Using mock profile.');
-            
-            resolve({
-              id: 'linkedin_real_user_456',
-              email: 'linkedin-user@example.com',
-              name: 'LinkedIn User',
-              picture: 'https://cdn-icons-png.flaticon.com/512/174/174857.png',
-            });
+            // Send the authorization code to our backend to exchange for an access token
+            const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+            try {
+              const response = await fetch(`${API_BASE_URL}/linkedin/exchange-token`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code, redirectUri })
+              });
+
+              const profile = await response.json();
+              
+              if (!response.ok) {
+                throw new Error(profile.message || 'Failed to exchange LinkedIn token');
+              }
+
+              resolve(profile);
+            } catch (err) {
+              console.error('LinkedIn token exchange error:', err);
+              reject(new Error('Backend token exchange failed.'));
+            }
           } else {
             popup.close();
             reject(new Error('LinkedIn authorization failed. No code received.'));

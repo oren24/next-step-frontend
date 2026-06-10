@@ -88,7 +88,40 @@ export const login = async (email, password) => {
   };
 };
 
+/**
+ * OAuth Login (creates user if doesn't exist)
+ * @param {string} email - User email
+ * @param {string} name - User name
+ * @returns {Promise<Object>} User and token
+ */
+export const oauthLogin = async (email, name) => {
+  if (!email || !name) {
+    throw new ValidationError('Email and name are required for OAuth');
+  }
+
+  let user = await authDal.getUserByEmail(email);
+
+  if (!user) {
+    // Generate a highly secure random password for OAuth users since they don't use it to log in
+    const randomPassword = globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now();
+    const passwordHash = await hashPassword(randomPassword);
+    user = await authDal.createUser(email, passwordHash, name.trim());
+  }
+
+  const token = generateToken(user.id);
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+    token,
+  };
+};
+
 export default {
   register,
   login,
+  oauthLogin,
 };

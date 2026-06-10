@@ -66,7 +66,7 @@ export default function ColumnHeader({
       >
         <Box
           component="img"
-          src="/src/assets/main section icons/plus.svg"
+          src="/assets/main section icons/plus.svg"
           sx={{
             width: '100%',
             height: '100%',

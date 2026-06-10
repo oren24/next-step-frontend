@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, Paper, Stack, Typography, CircularProgress, Alert, Link } from '@mui/material';
 import { connectionsApi } from '../api/apiClient';
 import AddConnectionModal from '../components/popapmodals/AddConnectionModal';
+import { useAuth } from '../auth/useAuth';
 
 // Fallback initial data in case the backend is down
 const fallbackConnections = [
@@ -18,6 +19,7 @@ const fallbackConnections = [
 ];
 
 export default function ConnectionsExchange() {
+  const { toolpadSession } = useAuth();
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,15 +32,20 @@ export default function ConnectionsExchange() {
         setConnections(response.data);
       } catch (err) {
         console.error('Failed to fetch connections:', err);
-        setError('Failed to connect to backend. Showing local mock data instead.');
-        setConnections(fallbackConnections);
+        if (toolpadSession?.user?.authProvider === 'github') {
+          setError('Demo Mode: Showing local mock data.');
+          setConnections(fallbackConnections);
+        } else {
+          setError('Failed to fetch connections from the server.');
+          setConnections([]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchConnections();
-  }, []);
+  }, [toolpadSession]);
 
   const handleAddConnection = async (data) => {
     try {

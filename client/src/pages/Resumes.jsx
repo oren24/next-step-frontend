@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, Paper, Stack, Typography, CircularProgress, Alert, Dialog } from '@mui/material';
 import { resumesApi } from '../api/apiClient';
 import AddResumeModal from '../components/popapmodals/AddResumeModal';
+import { useAuth } from '../auth/useAuth';
 
 // Fallback initial data in case the backend is down
 const fallbackResumes = [
@@ -20,6 +21,7 @@ const fallbackResumes = [
 ];
 
 export default function Resumes() {
+  const { toolpadSession } = useAuth();
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,15 +35,20 @@ export default function Resumes() {
         setResumes(response.data);
       } catch (err) {
         console.error('Failed to fetch resumes:', err);
-        setError('Failed to connect to backend. Showing local mock data instead.');
-        setResumes(fallbackResumes);
+        if (toolpadSession?.user?.authProvider === 'github') {
+          setError('Demo Mode: Showing local mock data.');
+          setResumes(fallbackResumes);
+        } else {
+          setError('Failed to fetch resumes from the server.');
+          setResumes([]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchResumes();
-  }, []);
+  }, [toolpadSession]);
 
   const handleAddResume = async (data) => {
     try {

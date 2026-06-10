@@ -35,7 +35,28 @@ export const login = async (req, res, next) => {
   }
 };
 
+/**
+ * OAuth Login controller
+ */
+export const oauthLogin = async (req, res, next) => {
+  try {
+    const { email, name, provider } = req.body; // Add basic validation directly here or via schema
+    if (!email || !name || !provider) {
+      return res.status(HTTP_CODES.BAD_REQUEST).json({ success: false, message: 'Email, name, and provider are required' });
+    }
+    const result = await authService.oauthLogin(email, name);
+    
+    res.status(HTTP_CODES.OK).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   register,
   login,
+  oauthLogin,
 };

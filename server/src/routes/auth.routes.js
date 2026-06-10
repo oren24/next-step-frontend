@@ -17,4 +17,10 @@ router.post('/register', validateRequest(registerSchema), authController.registe
  */
 router.post('/login', validateRequest(loginSchema), authController.login);
 
+/**
+ * POST /api/auth/oauth
+ * OAuth Login / Register user
+ */
+router.post('/oauth', authController.oauthLogin);
+
 export default router;

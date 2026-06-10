@@ -141,7 +141,7 @@ function ApplicationCard({
         >
           <Box
             component="img"
-            src="/src/assets/card application icons/three-dots.svg"
+            src="/assets/card application icons/three-dots.svg"
             alt="Menu"
             sx={{ width: 16, height: 16, pointerEvents: 'none' }}
           />
@@ -162,7 +162,7 @@ function ApplicationCard({
             >
               <Box
                 component="img"
-                src="/src/assets/card application icons/edit.svg"
+                src="/assets/card application icons/edit.svg"
                 alt="Edit"
                 sx={{ width: 24, height: 24 }}
               />
@@ -172,7 +172,7 @@ function ApplicationCard({
             <Box sx={CARD.menuItem}>
               <Box
                 component="img"
-                src="/src/assets/card application icons/move-to.svg"
+                src="/assets/card application icons/move-to.svg"
                 alt="Move To"
                 sx={{ width: 24, height: 24 }}
               />
@@ -191,7 +191,7 @@ function ApplicationCard({
             >
               <Box
                 component="img"
-                src="/src/assets/main section icons/si_link-duotone.svg"
+                src="/assets/main section icons/si_link-duotone.svg"
                 alt="Share"
                 sx={{ width: 24, height: 24 }}
               />
@@ -210,7 +210,7 @@ function ApplicationCard({
             >
               <Box
                 component="img"
-                src="/src/assets/card application icons/delete.svg"
+                src="/assets/card application icons/delete.svg"
                 alt="Delete"
                 sx={{ width: 24, height: 24 }}
               />

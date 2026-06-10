@@ -67,6 +67,7 @@ export default function JobApplications({
     setSelectedApp,
     setIsDrawerOpen,
     onDeleteApplication,
+    onNotify,
   });
 
   const handleDragEnd = useCallback((event) => {

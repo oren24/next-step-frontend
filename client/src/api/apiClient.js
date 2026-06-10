@@ -9,10 +9,12 @@ const handleResponse = async (response) => {
 };
 
 const getHeaders = () => {
-  // If you switch to JWT, add token here:
-  // const token = localStorage.getItem('token');
-  // return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-  return { 'Content-Type': 'application/json' };
+  const token = localStorage.getItem('authToken');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
 };
 
 export const resumesApi = {
@@ -60,5 +62,46 @@ export const connectionsApi = {
   delete: (id) => fetch(`${API_BASE_URL}/connections/${id}`, {
     method: 'DELETE',
     headers: getHeaders(),
+  }).then(handleResponse),
+};
+
+export const applicationsApi = {
+  getAll: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    const url = queryString ? `${API_BASE_URL}/applications?${queryString}` : `${API_BASE_URL}/applications`;
+    return fetch(url, { headers: getHeaders() }).then(handleResponse);
+  },
+  getById: (id) => fetch(`${API_BASE_URL}/applications/${id}`, { headers: getHeaders() }).then(handleResponse),
+  create: (data) => fetch(`${API_BASE_URL}/applications`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  }).then(handleResponse),
+  update: (id, data) => fetch(`${API_BASE_URL}/applications/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  }).then(handleResponse),
+  delete: (id) => fetch(`${API_BASE_URL}/applications/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+  }).then(handleResponse),
+};
+
+export const authApi = {
+  register: (data) => fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }).then(handleResponse),
+  login: (data) => fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }).then(handleResponse),
+  oauthLogin: (data) => fetch(`${API_BASE_URL}/auth/oauth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   }).then(handleResponse),
 };

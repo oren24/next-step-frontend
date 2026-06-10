@@ -5,31 +5,75 @@ import {
   updateAppStatus,
   withStatusHistoryEntry,
 } from '../utils/statusHistoryUtils.js';
+import { applicationsApi } from '../../../api/apiClient.js';
 
 export const useJobApplicationActions = ({
   setApps,
   setSelectedApp,
   setIsDrawerOpen,
   onDeleteApplication,
+  onNotify,
 }) => {
-  const handleUpdateAppStatus = useCallback((appId, newStatus) => {
+  const handleUpdateAppStatus = useCallback(async (appId, newStatus) => {
+    if (typeof appId === 'number') {
+      try {
+        await applicationsApi.update(appId, { status: newStatus });
+      } catch (error) {
+        if (onNotify) onNotify({ message: 'Failed to update status', severity: 'error' });
+        return;
+      }
+    }
+
     setApps((prev) => prev.map((app) => (
       app.id === appId ? updateAppStatus(app, newStatus) : app
     )));
-  }, [setApps]);
+  }, [setApps, onNotify]);
 
-  const handleDeleteApplication = useCallback((appId) => {
+  const handleDeleteApplication = useCallback(async (appId) => {
     if (onDeleteApplication) {
-      onDeleteApplication(appId);
+      await onDeleteApplication(appId);
       return;
     }
 
-    setApps((prev) => prev.filter((app) => app.id !== appId));
-  }, [onDeleteApplication, setApps]);
+    if (typeof appId === 'number') {
+      try {
+        await applicationsApi.delete(appId);
+      } catch (error) {
+        if (onNotify) onNotify({ message: 'Failed to delete application', severity: 'error' });
+        return;
+      }
+    }
 
-  const handleAddApplication = useCallback((newApp) => {
-    setApps((prev) => [...prev, newApp]);
-  }, [setApps]);
+    setApps((prev) => prev.filter((app) => app.id !== appId));
+  }, [onDeleteApplication, setApps, onNotify]);
+
+  const handleAddApplication = useCallback(async (newApp) => {
+    try {
+      const response = await applicationsApi.create({
+        company_name: newApp.companyName,
+        job_title: newApp.jobTitle,
+        job_url: newApp.jobUrl,
+        status: newApp.status,
+        description: newApp.description,
+        applied_date: newApp.appliedDate,
+      });
+
+      if (response.data) {
+        const createdApp = {
+          ...response.data,
+          companyName: response.data.company_name,
+          jobTitle: response.data.job_title,
+          jobUrl: response.data.job_url,
+          companyLogo: response.data.company_logo,
+          appliedDate: response.data.applied_date,
+        };
+        setApps((prev) => [...prev, createdApp]);
+        if (onNotify) onNotify({ message: 'Application created', severity: 'success' });
+      }
+    } catch (error) {
+      if (onNotify) onNotify({ message: 'Failed to create application', severity: 'error' });
+    }
+  }, [setApps, onNotify]);
 
   const handleOpenJobDrawer = useCallback((app) => {
     if (!app) return;
@@ -41,23 +85,41 @@ export const useJobApplicationActions = ({
     setIsDrawerOpen(false);
   }, [setIsDrawerOpen]);
 
-  const handleSaveNote = useCallback((appId, note) => {
+  const handleSaveNote = useCallback(async (appId, note) => {
+    if (typeof appId === 'number') {
+      try {
+        await applicationsApi.update(appId, { description: note });
+      } catch (error) {
+        if (onNotify) onNotify({ message: 'Failed to save note', severity: 'error' });
+        return;
+      }
+    }
+
     const now = getCurrentTimestamp();
 
     setApps((prev) => prev.map((item) => (
       item.id === appId
-        ? { ...item, note, notes: note, updatedAt: now }
+        ? { ...item, note, notes: note, description: note, updatedAt: now }
         : item
     )));
 
     setSelectedApp((prev) => (
       prev && prev.id === appId
-        ? { ...prev, note, notes: note, updatedAt: now }
+        ? { ...prev, note, notes: note, description: note, updatedAt: now }
         : prev
     ));
-  }, [setApps, setSelectedApp]);
+  }, [setApps, setSelectedApp, onNotify]);
 
-  const handleSaveInterviewStatus = useCallback((appId) => {
+  const handleSaveInterviewStatus = useCallback(async (appId) => {
+    if (typeof appId === 'number') {
+      try {
+        await applicationsApi.update(appId, { status: INTERVIEWING_STATUS });
+      } catch (error) {
+        if (onNotify) onNotify({ message: 'Failed to update interview status', severity: 'error' });
+        return;
+      }
+    }
+
     const now = getCurrentTimestamp();
 
     setApps((prev) => prev.map((item) => {
@@ -71,16 +133,32 @@ export const useJobApplicationActions = ({
       const updated = { ...prev, status: INTERVIEWING_STATUS, updatedAt: now };
       return withStatusHistoryEntry(updated, INTERVIEWING_STATUS, now);
     });
-  }, [setApps, setSelectedApp]);
+  }, [setApps, setSelectedApp, onNotify]);
 
-  const handleSaveEdit = useCallback((updatedApp) => {
+  const handleSaveEdit = useCallback(async (updatedApp) => {
+    if (typeof updatedApp.id === 'number') {
+      try {
+        await applicationsApi.update(updatedApp.id, {
+          company_name: updatedApp.companyName,
+          job_title: updatedApp.jobTitle,
+          job_url: updatedApp.jobUrl,
+          status: updatedApp.status,
+          description: updatedApp.description,
+          applied_date: updatedApp.appliedDate,
+        });
+      } catch (error) {
+        if (onNotify) onNotify({ message: 'Failed to save edits', severity: 'error' });
+        return;
+      }
+    }
+
     const now = getCurrentTimestamp();
     const savedApp = { ...updatedApp, updatedAt: now };
 
     setApps((prev) => prev.map((item) => (item.id === savedApp.id ? savedApp : item)));
     setSelectedApp((prev) => (prev && prev.id === savedApp.id ? savedApp : prev));
     setIsDrawerOpen(false);
-  }, [setApps, setSelectedApp, setIsDrawerOpen]);
+  }, [setApps, setSelectedApp, setIsDrawerOpen, onNotify]);
 
   return {
     handleUpdateAppStatus,

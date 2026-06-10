@@ -3,12 +3,12 @@ import { Box, Paper, Snackbar, Typography } from '@mui/material';
 import { TOAST, TOAST_SEVERITY } from './styles/toastStyles';
 
 const ICON_BY_SEVERITY = {
-  success: '/src/assets/toasts icons/lets-icons_check-fill.svg',
-  warning: '/src/assets/toasts icons/mdi-light_alert.svg',
-  error: '/src/assets/toasts icons/ix_error-filled.svg',
+  success: '/assets/toasts icons/lets-icons_check-fill.svg',
+  warning: '/assets/toasts icons/mdi-light_alert.svg',
+  error: '/assets/toasts icons/ix_error-filled.svg',
 };
 
-const CLOSE_ICON = '/src/assets/toasts icons/material-symbols-light_close.svg';
+const CLOSE_ICON = '/assets/toasts icons/material-symbols-light_close.svg';
 
 export default function GlobalToast({ open, message, severity, onClose }) {
   const severityStyle = TOAST_SEVERITY[severity] || TOAST_SEVERITY.success;

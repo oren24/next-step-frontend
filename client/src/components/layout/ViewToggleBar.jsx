@@ -139,7 +139,7 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [], onNotify 
         >
           <Box
             component="img"
-            src="/src/assets/main section icons/material-symbols-light_list.svg"
+            src="/assets/main section icons/material-symbols-light_list.svg"
             alt="List"
             sx={{
               ...iconBaseStyle,
@@ -165,7 +165,7 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [], onNotify 
         >
           <Box
             component="img"
-            src="/src/assets/main section icons/tabler_blocks.svg"
+            src="/assets/main section icons/tabler_blocks.svg"
             alt="Kanban"
             sx={{
               ...iconBaseStyle,
@@ -189,7 +189,7 @@ const ViewToggleBar = ({ currentView, onViewChange, applications = [], onNotify 
       <Button sx={exportButtonStyle} onClick={handleOpenExportMenu}>
         <Box
           component="img"
-          src="/src/assets/main section icons/excel.svg"
+          src="/assets/main section icons/excel.svg"
           alt="Export"
           sx={{
             width: 24,
