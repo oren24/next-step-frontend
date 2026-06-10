@@ -23,4 +23,13 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      '/api/linkedin': {
+        target: 'https://api.linkedin.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/linkedin/, '')
+      }
+    }
+  }
 })

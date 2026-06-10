@@ -4,6 +4,7 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { useAuth } from '../../auth/useAuth.js';
 import { signInWithGooglePopup } from '../../auth/googleAuth.js';
+import { signInWithLinkedInPopup } from '../../auth/linkedinAuth.js';
 import { ThemeToggle } from '../../components/layout/TopBarUtils.jsx';
 
 function SignUpPromptLink() {
@@ -47,9 +48,20 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
       }
     }
 
+    if (provider.id === 'github') {
+      try {
+        await signInWithProvider({ provider: 'github', remember: true });
+        navigate(redirectPath, { replace: true });
+        return {};
+      } catch (error) {
+        return { error: error.message || 'Unable to sign in with GitHub.' };
+      }
+    }
+
     if (provider.id === 'linkedin') {
       try {
-        await signInWithProvider({ provider: 'linkedin', remember: true });
+        const linkedinProfile = await signInWithLinkedInPopup({ clientId: import.meta.env.VITE_LINKEDIN_CLIENT_ID });
+        await signInWithProvider({ provider: 'linkedin', remember: true, profile: linkedinProfile });
         navigate(redirectPath, { replace: true });
         return {};
       } catch (error) {

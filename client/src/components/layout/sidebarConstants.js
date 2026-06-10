@@ -8,6 +8,7 @@ import settingsIcon from '../../assets/side bar icons/solar_settings-linear.svg'
 export const navigationItems = [
   { id: 'job-applications', label: 'Job Applications', path: '/', icon: jobApplicationsIcon },
   { id: 'resumes', label: 'Resumes', path: '/resumes', icon: resumesIcon },
+  { id: 'connections', label: 'Connections', path: '/connections', icon: subscriptionsIcon },
   { id: 'subscriptions', label: 'Subscriptions', path: '/subscriptions', icon: subscriptionsIcon },
   { id: 'drafts', label: 'Drafts', path: '/drafts', icon: draftsIcon },
   { id: 'archive', label: 'Archive', path: '/archive', icon: archiveIcon },

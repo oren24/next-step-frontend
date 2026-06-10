@@ -6,6 +6,7 @@ import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute.jsx';
 
 const JobApplications = lazy(() => import('../pages/JobApplications'));
 const Resumes = lazy(() => import('../pages/Resumes'));
+const ConnectionsExchange = lazy(() => import('../pages/ConnectionsExchange'));
 const Subscriptions = lazy(() => import('../pages/Subscriptions'));
 const Archive = lazy(() => import('../pages/Archive'));
 const Drafts = lazy(() => import('../pages/Drafts'));
@@ -80,6 +81,7 @@ export default function AppRoutes({
           )}
         />
         <Route path="resumes" element={withRouteFallback(<Resumes />)} />
+        <Route path="connections" element={withRouteFallback(<ConnectionsExchange />)} />
         <Route path="subscriptions" element={withRouteFallback(<Subscriptions />)} />
         <Route path="drafts" element={withRouteFallback(<Drafts apps={apps} />)} />
         <Route
