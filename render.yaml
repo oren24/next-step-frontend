@@ -15,8 +15,7 @@ services:
           name: nextstep-db
           property: connectionString
 
-  # The PostgreSQL Database
-  - type: pgo
-    name: nextstep-db
+# The PostgreSQL Database
+databases:
+  - name: nextstep-db
     plan: free
-    postgresMajorVersion: 15
