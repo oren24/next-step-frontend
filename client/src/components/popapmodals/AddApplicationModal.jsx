@@ -19,6 +19,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { ADD_MODAL } from './styles/addModalStyles';
@@ -65,6 +67,8 @@ const createInitialFormData = (status) => ({
 });
 
 const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoading = false }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [formData, setFormData] = useState(() => createInitialFormData(status));
 
   const handleDialogEnter = () => {
@@ -118,6 +122,7 @@ const AddApplicationModal = ({ open, onClose, onSave, status = 'Wishlist', isLoa
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={isMobile}
       TransitionProps={{ onEnter: handleDialogEnter }}
       PaperProps={{
         sx: {

@@ -20,6 +20,8 @@ import {
   MenuItem,
   Chip,
   Stack,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { EDIT_MODAL } from './styles/editModalStyles';
@@ -46,6 +48,8 @@ const createInitialFormData = (application) => ({
 });
 
 const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = false }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [formData, setFormData] = useState(() => createInitialFormData(application));
   const [tagInput, setTagInput] = useState('');
 
@@ -101,6 +105,7 @@ const EditApplicationModal = ({ open, onClose, onSave, application, isLoading = 
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={isMobile}
       slotProps={{
         transition: { onEnter: handleDialogEnter },
         paper: {

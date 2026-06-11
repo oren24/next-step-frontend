@@ -7,10 +7,14 @@ import {
   DialogTitle,
   TextField,
   Stack,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 
 export default function AddConnectionModal({ open, onClose, onSubmit, initialData }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [contactDetails, setContactDetails] = useState('');
@@ -74,7 +78,7 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" fullScreen={isMobile}>
       <DialogTitle>{initialData ? 'Edit Connection' : 'Add New Connection'}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>

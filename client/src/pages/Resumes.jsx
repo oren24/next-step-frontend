@@ -5,6 +5,7 @@ import AddResumeModal from '../components/popapmodals/AddResumeModal';
 import { useAuth } from '../auth/useAuth';
 import { storage } from '../config/firebase';
 import { ref, deleteObject } from 'firebase/storage';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 // Fallback initial data in case the backend is down
 const fallbackResumes = [
@@ -23,6 +24,8 @@ const fallbackResumes = [
 ];
 
 export default function Resumes() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { toolpadSession } = useAuth();
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,7 +134,7 @@ export default function Resumes() {
           ) : (
             resumes.map((resume) => (
               <Paper key={resume.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ flexWrap: 'wrap', gap: 1 }}>
                   <Box>
                     <Typography sx={{ fontWeight: 700 }}>{resume.title}</Typography>
                     <Typography sx={{ color: 'text.secondary', mt: 0.25 }}>{resume.target_role || resume.targetRole}</Typography>
@@ -184,6 +187,7 @@ export default function Resumes() {
         onClose={() => setPreviewUrl(null)}
         maxWidth="lg"
         fullWidth
+        fullScreen={isMobile}
       >
         <Box sx={{ height: '80vh', display: 'flex', flexDirection: 'column' }}>
           <Stack direction="row" justifyContent="flex-end" p={1} bgcolor="grey.100">

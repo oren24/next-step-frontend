@@ -9,10 +9,14 @@ import {
   DialogTitle,
   TextField,
   Stack,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 
 export default function AddResumeModal({ open, onClose, onSubmit }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [title, setTitle] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [note, setNote] = useState('');
@@ -71,7 +75,7 @@ export default function AddResumeModal({ open, onClose, onSubmit }) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" fullScreen={isMobile}>
       <DialogTitle>Add New Resume</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>

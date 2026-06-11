@@ -125,7 +125,7 @@ export const BOARD = {
   },
   // Generic status header styles
   statusHeader: {
-    width: 335,
+    width: '100%',
     height: 44,
     opacity: 1,
     borderRadius: '8px',
@@ -133,66 +133,48 @@ export const BOARD = {
     borderStyle: 'solid',
     borderBottom: 'none',
     backgroundColor: 'transparent',
-    margin: '0 auto', // Center the header
   },
   // Base styles for all status icons
   baseStatusIcon: {
-    position: 'absolute',
     opacity: 1,
     filter: 'brightness(0) saturate(100%)',
+    display: 'block',
   },
   // Base styles for all plus icons
   basePlusIcon: {
-    position: 'absolute',
-    top: '10px',
-    left: '296px',
     width: 18,
     height: 18,
     opacity: 1,
     filter: 'brightness(0) saturate(100%)',
+    display: 'flex',
   },
   // Individual icon unique properties only
   wishlistIcon: {
-    top: '25%',
-    left: '5.6%',
     width: 23,
     height: 23,
     filter: 'brightness(0) saturate(100%) invert(20%) sepia(69%) saturate(3151%) hue-rotate(243deg) brightness(98%) contrast(97%)',
   },
   appliedIcon: {
-    top: '26%',
-    left: '5.6%',
     width: 20,
     height: 22,
     filter: 'brightness(0) saturate(100%) invert(65%) sepia(52%) saturate(6142%) hue-rotate(338deg) brightness(102%) contrast(96%)',
   },
   interviewingIcon: {
-    top: '28%',
-    left: '5.6%',
     width: 22,
     height: 20,
     filter: 'brightness(0) saturate(100%) invert(66%) sepia(63%) saturate(1425%) hue-rotate(10deg) brightness(104%) contrast(98%)',
   },
   offerIcon: {
-    top: '22%',
-    left: '5.6%',
     width: 25,
     height: 25,
     filter: 'brightness(0) saturate(100%) invert(58%) sepia(60%) saturate(402%) hue-rotate(78deg) brightness(119%) contrast(89%)',
   },
   rejectedIcon: {
-    top: '28%',
-    left: '3.6%',
     width: 20,
     height: 20,
     filter: 'brightness(0) saturate(100%) invert(67%) sepia(7%) saturate(928%) hue-rotate(169deg) brightness(96%) contrast(88%)',
   },
   statusTitle: {
-    position: 'absolute',
-    top: '4px',
-    left: '59px',
-    width: 117,
-    height: 37,
     fontFamily: '"Space Grotesk", sans-serif',
     fontWeight: 500,
     fontSize: '20px',
@@ -201,9 +183,6 @@ export const BOARD = {
     ml: 0,
   },
   statusActionIcon: {
-    position: 'absolute',
-    top: '10px',
-    left: '296px',
     width: 24,
     height: 24,
     opacity: 1,
@@ -226,7 +205,7 @@ export const BOARD = {
   },
   // Empty State Card Styles
   emptyStateCard: {
-    width: 335,
+    width: '100%',
     height: 196,
     opacity: 1,
     borderRadius: '10px',

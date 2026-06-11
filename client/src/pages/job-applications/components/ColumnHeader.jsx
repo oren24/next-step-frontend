@@ -20,31 +20,32 @@ export default function ColumnHeader({
         '--header-color': colors.header,
         '--header-bg': colors.headerBg,
         '--card-bg': colors.cardBg,
-        position: 'relative',
         ...BOARD.statusHeader,
       }}
     >
-      {!isRejectedStatus && (
-        <Box
-          component="img"
-          src={statusIcon}
-          sx={{
-            ...BOARD.baseStatusIcon,
-            ...iconStyle,
-          }}
-        />
-      )}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        {!isRejectedStatus && (
+          <Box
+            component="img"
+            src={statusIcon}
+            sx={{
+              ...BOARD.baseStatusIcon,
+              ...iconStyle,
+            }}
+          />
+        )}
 
-      <Typography
-        variant="subtitle1"
-        sx={{
-          ...BOARD.columnTitle,
-          ...BOARD.statusTitle,
-          color: colors.header,
-        }}
-      >
-        {status === 'Wishlist' ? 'Wishlist' : status}
-      </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            ...BOARD.columnTitle,
+            ...BOARD.statusTitle,
+            color: colors.header,
+          }}
+        >
+          {status === 'Wishlist' ? 'Wishlist' : status}
+        </Typography>
+      </Box>
 
       <Box
         component="button"
@@ -56,9 +57,6 @@ export default function ColumnHeader({
           border: 'none',
           cursor: 'pointer',
           padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           '&:hover': {
             opacity: 0.8,
           },
