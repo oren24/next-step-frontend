@@ -24,6 +24,7 @@ export default function ConnectionsExchange() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingConnection, setEditingConnection] = useState(null);
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -47,19 +48,39 @@ export default function ConnectionsExchange() {
     fetchConnections();
   }, [toolpadSession]);
 
-  const handleAddConnection = async (data) => {
+  const handleConnectionSubmit = async (data) => {
     try {
-      const response = await connectionsApi.create(data);
-      setConnections([response.data, ...connections]);
+      if (editingConnection) {
+        const response = await connectionsApi.update(editingConnection.id, data);
+        setConnections(connections.map(c => c.id === editingConnection.id ? response.data : c));
+      } else {
+        const response = await connectionsApi.create(data);
+        setConnections([response.data, ...connections]);
+      }
     } catch (err) {
-      console.error('Failed to add connection via API:', err);
+      console.error('Failed to save connection via API:', err);
       // Fallback for UI if DB is offline
-      const newMockConnection = {
-        id: `mock-new-${Date.now()}`,
-        ...data
-      };
-      setConnections([newMockConnection, ...connections]);
-      setError('Backend unavailable. Connection added to local UI only.');
+      if (editingConnection) {
+        setConnections(connections.map(c => c.id === editingConnection.id ? { ...c, ...data } : c));
+        setError('Backend unavailable. Connection updated locally.');
+      } else {
+        const newMockConnection = { id: `mock-new-${Date.now()}`, ...data };
+        setConnections([newMockConnection, ...connections]);
+        setError('Backend unavailable. Connection added locally.');
+      }
+    }
+  };
+
+  const handleDeleteConnection = async (conn) => {
+    if (!window.confirm(`Are you sure you want to delete ${conn.name}?`)) return;
+    try {
+      if (!conn.id.toString().startsWith('mock-')) {
+        await connectionsApi.delete(conn.id);
+      }
+      setConnections(connections.filter(c => c.id !== conn.id));
+    } catch (err) {
+      console.error('Failed to delete connection:', err);
+      setError('Failed to delete connection. Please try again.');
     }
   };
 
@@ -72,7 +93,7 @@ export default function ConnectionsExchange() {
             Manage your professional network and contact details.
           </Typography>
         </Box>
-        <Button variant="contained" onClick={() => setModalOpen(true)}>Add Connection</Button>
+        <Button variant="contained" onClick={() => { setEditingConnection(null); setModalOpen(true); }}>Add Connection</Button>
       </Stack>
 
       {error && <Alert severity="warning" sx={{ mb: 2 }}>{error}</Alert>}
@@ -88,14 +109,33 @@ export default function ConnectionsExchange() {
           ) : (
             connections.map((conn) => (
               <Paper key={conn.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
-                  {conn.name}
-                  {conn.role && (
-                    <Typography component="span" sx={{ color: 'text.secondary', fontWeight: 'normal', ml: 1 }}>
-                      • {conn.role}
-                    </Typography>
-                  )}
-                </Typography>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                  <Typography sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                    {conn.name}
+                    {conn.role && (
+                      <Typography component="span" sx={{ color: 'text.secondary', fontWeight: 'normal', ml: 1 }}>
+                        • {conn.role}
+                      </Typography>
+                    )}
+                  </Typography>
+                  <Stack direction="row" spacing={1}>
+                    <Button 
+                      variant="outlined" 
+                      size="small"
+                      onClick={() => { setEditingConnection(conn); setModalOpen(true); }}
+                    >
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="outlined" 
+                      color="error" 
+                      size="small"
+                      onClick={() => handleDeleteConnection(conn)}
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
+                </Stack>
                 
                 <Stack direction="row" spacing={2} sx={{ mt: 1, mb: 1, flexWrap: 'wrap', gap: 1 }}>
                   {conn.contact_details && (
@@ -134,8 +174,9 @@ export default function ConnectionsExchange() {
 
       <AddConnectionModal 
         open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        onSubmit={handleAddConnection} 
+        onClose={() => { setModalOpen(false); setEditingConnection(null); }} 
+        onSubmit={handleConnectionSubmit} 
+        initialData={editingConnection}
       />
     </Box>
   );

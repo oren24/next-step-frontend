@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Dialog,
@@ -10,7 +10,7 @@ import {
   Alert
 } from '@mui/material';
 
-export default function AddConnectionModal({ open, onClose, onSubmit }) {
+export default function AddConnectionModal({ open, onClose, onSubmit, initialData }) {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [contactDetails, setContactDetails] = useState('');
@@ -20,6 +20,19 @@ export default function AddConnectionModal({ open, onClose, onSubmit }) {
   const [notes, setNotes] = useState('');
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setName(initialData?.name || '');
+      setRole(initialData?.role || '');
+      setContactDetails(initialData?.contact_details || '');
+      setPortfolioUrl(initialData?.portfolio_url || '');
+      setLocationOrCompany(initialData?.location_or_company || '');
+      setLastContactedDate(initialData?.last_contacted_date ? initialData.last_contacted_date.split('T')[0] : '');
+      setNotes(initialData?.notes || '');
+      setError(null);
+    }
+  }, [open, initialData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +75,7 @@ export default function AddConnectionModal({ open, onClose, onSubmit }) {
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add New Connection</DialogTitle>
+      <DialogTitle>{initialData ? 'Edit Connection' : 'Add New Connection'}</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent dividers>
           <Stack spacing={2}>
@@ -134,7 +147,7 @@ export default function AddConnectionModal({ open, onClose, onSubmit }) {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>
-            {isSubmitting ? 'Saving...' : 'Add Connection'}
+            {isSubmitting ? 'Saving...' : (initialData ? 'Save Changes' : 'Add Connection')}
           </Button>
         </DialogActions>
       </form>
