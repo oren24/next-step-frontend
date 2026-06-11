@@ -3,6 +3,8 @@ import { Box, Button, Paper, Stack, Typography, CircularProgress, Alert, Dialog 
 import { resumesApi, getServerUrl } from '../api/apiClient';
 import AddResumeModal from '../components/popapmodals/AddResumeModal';
 import { useAuth } from '../auth/useAuth';
+import { storage } from '../config/firebase';
+import { ref, deleteObject } from 'firebase/storage';
 
 // Fallback initial data in case the backend is down
 const fallbackResumes = [
@@ -70,6 +72,40 @@ export default function Resumes() {
     }
   };
 
+  const handleDeleteResume = async (resume) => {
+    if (!window.confirm(`Are you sure you want to delete "${resume.title}"?`)) return;
+
+    try {
+      // 1. Delete from Firebase Storage if applicable
+      if (resume.file_path && resume.file_path.includes('firebasestorage.googleapis.com')) {
+        try {
+          // Firebase Storage URLs encode the path between '/o/' and '?alt=media'
+          const decodedUrl = decodeURIComponent(resume.file_path);
+          const pathStartIndex = decodedUrl.indexOf('/o/') + 3;
+          const pathEndIndex = decodedUrl.indexOf('?alt=media');
+          if (pathStartIndex > 2 && pathEndIndex > -1) {
+            const storagePath = decodedUrl.substring(pathStartIndex, pathEndIndex);
+            const fileRef = ref(storage, storagePath);
+            await deleteObject(fileRef);
+          }
+        } catch (storageErr) {
+          console.error('Failed to delete file from Firebase Storage:', storageErr);
+        }
+      }
+
+      // 2. Delete from backend database
+      if (!resume.id.toString().startsWith('mock-')) {
+        await resumesApi.delete(resume.id);
+      }
+
+      // 3. Update UI state
+      setResumes(resumes.filter(r => r.id !== resume.id));
+    } catch (err) {
+      console.error('Failed to delete resume:', err);
+      setError('Failed to delete resume. Please try again.');
+    }
+  };
+
   return (
     <Box sx={{ width: '100%', pt: 1 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
@@ -101,24 +137,34 @@ export default function Resumes() {
                     <Typography sx={{ color: 'text.secondary', mt: 0.25 }}>{resume.target_role || resume.targetRole}</Typography>
                     <Typography sx={{ fontSize: '0.86rem', mt: 1 }}>{resume.note}</Typography>
                   </Box>
-                  {(resume.file_path || resume.original_filename) && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    {(resume.file_path || resume.original_filename) && (
+                      <Button 
+                        variant="outlined" 
+                        size="small"
+                        onClick={() => {
+                          if (!resume.file_path) {
+                            alert("No file available for preview.");
+                            return;
+                          }
+                          const url = resume.file_path.startsWith('http') || resume.file_path.startsWith('blob:') 
+                            ? resume.file_path 
+                            : `${getServerUrl()}/${resume.file_path.replace(/\\/g, '/').replace(/^\//, '')}`;
+                          setPreviewUrl(url);
+                        }}
+                      >
+                        {resume.original_filename || 'Preview PDF'}
+                      </Button>
+                    )}
                     <Button 
                       variant="outlined" 
+                      color="error" 
                       size="small"
-                      onClick={() => {
-                        if (!resume.file_path) {
-                          alert("No file available for preview.");
-                          return;
-                        }
-                        const url = resume.file_path.startsWith('http') || resume.file_path.startsWith('blob:') 
-                          ? resume.file_path 
-                          : `${getServerUrl()}/${resume.file_path.replace(/\\/g, '/').replace(/^\//, '')}`;
-                        setPreviewUrl(url);
-                      }}
+                      onClick={() => handleDeleteResume(resume)}
                     >
-                      {resume.original_filename || 'Preview PDF'}
+                      Delete
                     </Button>
-                  )}
+                  </Stack>
                 </Stack>
               </Paper>
             ))

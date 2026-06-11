@@ -3,7 +3,7 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
       allow read: if true; // Allows anyone to read (for previewing the URL)
-      allow write: if request.resource.size < 5 * 1024 * 1024; // Allow uploads up to 5MB (since Firebase Auth is not used)
+      allow write: if request.resource == null || request.resource.size < 5 * 1024 * 1024; // Allow uploads up to 5MB and deletes
     }
   }
 }
