@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Box, Button, Paper, Stack, Typography, CircularProgress, Alert, Dialog } from '@mui/material';
-import { resumesApi } from '../api/apiClient';
+import { resumesApi, getServerUrl } from '../api/apiClient';
 import AddResumeModal from '../components/popapmodals/AddResumeModal';
 import { useAuth } from '../auth/useAuth';
 
@@ -57,15 +57,13 @@ export default function Resumes() {
     } catch (err) {
       console.error('Failed to add resume via API:', err);
       // Fallback for UI if DB is offline
-      const isFormData = data instanceof FormData;
-      const file = isFormData ? data.get('file') : null;
       const newMockResume = {
         id: `mock-new-${Date.now()}`,
-        title: isFormData ? data.get('title') : data.title,
-        target_role: isFormData ? data.get('target_role') : data.target_role,
-        note: isFormData ? data.get('note') : data.note,
-        original_filename: file ? file.name : null,
-        file_path: file ? URL.createObjectURL(file) : null,
+        title: data.title,
+        target_role: data.target_role,
+        note: data.note,
+        original_filename: data.original_filename,
+        file_path: data.file_path,
       };
       setResumes([newMockResume, ...resumes]);
       setError('Backend unavailable. Resume added to local UI only.');
@@ -112,9 +110,9 @@ export default function Resumes() {
                           alert("No file available for preview.");
                           return;
                         }
-                        const url = resume.file_path.startsWith('blob:') 
+                        const url = resume.file_path.startsWith('http') || resume.file_path.startsWith('blob:') 
                           ? resume.file_path 
-                          : `http://localhost:5000/${resume.file_path}`;
+                          : `${getServerUrl()}/${resume.file_path.replace(/\\/g, '/').replace(/^\//, '')}`;
                         setPreviewUrl(url);
                       }}
                     >

@@ -15,7 +15,14 @@ app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  xFrameOptions: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      frameAncestors: ["'self'", process.env.FRONTEND_URL || "http://localhost:5173", "https://*.firebaseapp.com", "https://*.web.app"]
+    }
+  }
 }));
 
 // CORS configuration

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { storage } from '../../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   Button,
   Dialog,
@@ -29,13 +31,23 @@ export default function AddResumeModal({ open, onClose, onSubmit }) {
     try {
       setIsSubmitting(true);
       
-      const formData = new FormData();
-      formData.append('title', title);
-      if (targetRole) formData.append('target_role', targetRole);
-      if (note) formData.append('note', note);
-      if (file) formData.append('file', file);
+      let filePath = null;
+      if (file) {
+        if (!storage) throw new Error('Firebase Storage is not configured.');
+        const fileRef = ref(storage, `resumes/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`);
+        await uploadBytes(fileRef, file);
+        filePath = await getDownloadURL(fileRef);
+      }
+      
+      const payload = {
+        title,
+        target_role: targetRole || undefined,
+        note: note || undefined,
+        file_path: filePath || undefined,
+        original_filename: file ? file.name : undefined
+      };
 
-      await onSubmit(formData);
+      await onSubmit(payload);
       
       setTitle('');
       setTargetRole('');

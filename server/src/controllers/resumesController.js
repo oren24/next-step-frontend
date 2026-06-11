@@ -22,11 +22,7 @@ export const getResumeById = async (req, res) => {
 export const createResume = async (req, res) => {
   const userId = req.userId;
   const data = req.body;
-  if (req.file) {
-    // Save relative path for easy serving
-    data.file_path = `uploads/resumes/${req.file.filename}`;
-    data.original_filename = req.file.originalname;
-  }
+
   const newResume = await resumeService.createResume(userId, data);
   res.status(201).json({
     success: true,
@@ -38,10 +34,7 @@ export const updateResume = async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const data = req.body;
-  if (req.file) {
-    data.file_path = `uploads/resumes/${req.file.filename}`;
-    data.original_filename = req.file.originalname;
-  }
+
   const updatedResume = await resumeService.updateResume(id, userId, data);
   res.json({
     success: true,
