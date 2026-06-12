@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { MuiTelInput } from 'mui-tel-input';
 
 export default function AddConnectionModal({ open, onClose, onSubmit, initialData }) {
   const theme = useTheme();
@@ -128,13 +129,12 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
               placeholder="e.g. jane.doe@example.com"
             />
             
-            <TextField
+            <MuiTelInput
               label="Phone Number"
               fullWidth
-              type="tel"
+              defaultCountry="IL"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="e.g. +972523504079"
+              onChange={(newValue) => setPhone(newValue)}
             />
 
             <TextField
