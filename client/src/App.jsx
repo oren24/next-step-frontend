@@ -93,14 +93,18 @@ function App({ isDarkMode, onToggleTheme }) {
         let loadedApps = response.data || [];
         
         // Map backend snake_case to frontend camelCase
-        loadedApps = loadedApps.map(app => ({
-          ...app,
-          companyName: app.company_name,
-          jobTitle: app.job_title,
-          jobUrl: app.job_url,
-          companyLogo: app.company_logo,
-          appliedDate: app.applied_date
-        }));
+        loadedApps = loadedApps.map(app => {
+          const formattedStatus = app.status ? app.status.charAt(0).toUpperCase() + app.status.slice(1) : 'Wishlist';
+          return {
+            ...app,
+            status: formattedStatus,
+            companyName: app.company_name,
+            jobTitle: app.job_title,
+            jobUrl: app.job_url,
+            companyLogo: app.company_logo,
+            appliedDate: app.applied_date
+          };
+        });
 
         if (loadedApps.length === 0 && toolpadSession?.user?.authProvider === 'github') {
           const demoApps = mockApplications.map((app) => {

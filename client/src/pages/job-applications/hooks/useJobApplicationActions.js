@@ -17,7 +17,7 @@ export const useJobApplicationActions = ({
   const handleUpdateAppStatus = useCallback(async (appId, newStatus) => {
     if (typeof appId === 'number') {
       try {
-        await applicationsApi.update(appId, { status: newStatus });
+        await applicationsApi.update(appId, { status: newStatus.toLowerCase() });
       } catch (error) {
         if (onNotify) onNotify({ message: 'Failed to update status', severity: 'error' });
         return;
@@ -49,18 +49,23 @@ export const useJobApplicationActions = ({
 
   const handleAddApplication = useCallback(async (newApp) => {
     try {
-      const response = await applicationsApi.create({
+      const payload = {
         company_name: newApp.companyName,
         job_title: newApp.jobTitle,
-        job_url: newApp.jobUrl,
-        status: newApp.status,
+        status: newApp.status ? newApp.status.toLowerCase() : 'wishlist',
         description: newApp.description,
-        applied_date: newApp.appliedDate,
-      });
+        applied_date: newApp.appliedDate || undefined,
+      };
+      if (newApp.jobUrl && newApp.jobUrl.trim() !== '') {
+        payload.job_url = newApp.jobUrl;
+      }
+
+      const response = await applicationsApi.create(payload);
 
       if (response.data) {
         const createdApp = {
           ...response.data,
+          status: response.data.status ? response.data.status.charAt(0).toUpperCase() + response.data.status.slice(1) : 'Wishlist',
           companyName: response.data.company_name,
           jobTitle: response.data.job_title,
           jobUrl: response.data.job_url,
@@ -113,7 +118,7 @@ export const useJobApplicationActions = ({
   const handleSaveInterviewStatus = useCallback(async (appId) => {
     if (typeof appId === 'number') {
       try {
-        await applicationsApi.update(appId, { status: INTERVIEWING_STATUS });
+        await applicationsApi.update(appId, { status: INTERVIEWING_STATUS.toLowerCase() });
       } catch (error) {
         if (onNotify) onNotify({ message: 'Failed to update interview status', severity: 'error' });
         return;
@@ -138,14 +143,18 @@ export const useJobApplicationActions = ({
   const handleSaveEdit = useCallback(async (updatedApp) => {
     if (typeof updatedApp.id === 'number') {
       try {
-        await applicationsApi.update(updatedApp.id, {
+        const payload = {
           company_name: updatedApp.companyName,
           job_title: updatedApp.jobTitle,
-          job_url: updatedApp.jobUrl,
-          status: updatedApp.status,
+          status: updatedApp.status ? updatedApp.status.toLowerCase() : 'wishlist',
           description: updatedApp.description,
-          applied_date: updatedApp.appliedDate,
-        });
+          applied_date: updatedApp.appliedDate || undefined,
+        };
+        if (updatedApp.jobUrl && updatedApp.jobUrl.trim() !== '') {
+          payload.job_url = updatedApp.jobUrl;
+        }
+
+        await applicationsApi.update(updatedApp.id, payload);
       } catch (error) {
         if (onNotify) onNotify({ message: 'Failed to save edits', severity: 'error' });
         return;
