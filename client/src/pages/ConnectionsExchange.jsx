@@ -138,11 +138,6 @@ export default function ConnectionsExchange() {
                 </Stack>
                 
                 <Stack direction="row" spacing={2} sx={{ mt: 1, mb: 1, flexWrap: 'wrap', gap: 1 }}>
-                  {conn.contact_details && (
-                    <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-                      <strong>Contact:</strong> {conn.contact_details}
-                    </Typography>
-                  )}
                   {conn.location_or_company && (
                     <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
                       <strong>Company/Location:</strong> {conn.location_or_company}
@@ -155,6 +150,57 @@ export default function ConnectionsExchange() {
                   )}
                 </Stack>
                 
+                {conn.contact_details && (
+                  <Box sx={{ mb: 1.5 }}>
+                    {(() => {
+                      let parsedContact = null;
+                      if (conn.contact_details.startsWith('{')) {
+                        try { parsedContact = JSON.parse(conn.contact_details); } catch (e) {}
+                      }
+                      
+                      if (parsedContact) {
+                        return (
+                          <Stack spacing={0.5}>
+                            {parsedContact.email && (
+                              <Typography sx={{ fontSize: '0.85rem' }}>
+                                <strong>Email:</strong> <Link href={`mailto:${parsedContact.email}`}>{parsedContact.email}</Link>
+                              </Typography>
+                            )}
+                            {parsedContact.phone && (
+                              <Stack direction="row" alignItems="center" spacing={1}>
+                                <Typography sx={{ fontSize: '0.85rem' }}>
+                                  <strong>Phone:</strong> {parsedContact.phone}
+                                </Typography>
+                                <Button 
+                                  variant="contained" 
+                                  color="success" 
+                                  size="small"
+                                  href={`https://wa.me/${parsedContact.phone.replace(/[^0-9]/g, '')}`}
+                                  target="_blank"
+                                  sx={{ py: 0, px: 1, minWidth: 'auto', textTransform: 'none', fontSize: '0.75rem', borderRadius: 4 }}
+                                >
+                                  WhatsApp
+                                </Button>
+                              </Stack>
+                            )}
+                            {parsedContact.linkedin && (
+                              <Typography sx={{ fontSize: '0.85rem' }}>
+                                <strong>LinkedIn:</strong> <Link href={parsedContact.linkedin.startsWith('http') ? parsedContact.linkedin : `https://${parsedContact.linkedin}`} target="_blank" rel="noopener">{parsedContact.linkedin}</Link>
+                              </Typography>
+                            )}
+                          </Stack>
+                        );
+                      } else {
+                        return (
+                          <Typography sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
+                            <strong>Contact:</strong> {conn.contact_details}
+                          </Typography>
+                        );
+                      }
+                    })()}
+                  </Box>
+                )}
+
                 {conn.portfolio_url && (
                   <Typography sx={{ fontSize: '0.85rem', mb: 1 }}>
                     <strong>Portfolio/GitHub:</strong> <Link href={conn.portfolio_url} target="_blank" rel="noopener">{conn.portfolio_url}</Link>

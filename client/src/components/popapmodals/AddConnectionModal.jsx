@@ -17,7 +17,9 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
-  const [contactDetails, setContactDetails] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [linkedin, setLinkedin] = useState('');
   const [portfolioUrl, setPortfolioUrl] = useState('');
   const [locationOrCompany, setLocationOrCompany] = useState('');
   const [lastContactedDate, setLastContactedDate] = useState('');
@@ -29,7 +31,19 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
     if (open) {
       setName(initialData?.name || '');
       setRole(initialData?.role || '');
-      setContactDetails(initialData?.contact_details || '');
+      let parsedContact = {};
+      try {
+        if (initialData?.contact_details?.startsWith('{')) {
+          parsedContact = JSON.parse(initialData.contact_details);
+        } else {
+          parsedContact = { email: initialData?.contact_details || '' };
+        }
+      } catch (e) {
+        parsedContact = { email: initialData?.contact_details || '' };
+      }
+      setEmail(parsedContact.email || '');
+      setPhone(parsedContact.phone || '');
+      setLinkedin(parsedContact.linkedin || '');
       setPortfolioUrl(initialData?.portfolio_url || '');
       setLocationOrCompany(initialData?.location_or_company || '');
       setLastContactedDate(initialData?.last_contacted_date ? initialData.last_contacted_date.split('T')[0] : '');
@@ -51,7 +65,7 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
       await onSubmit({
         name,
         role,
-        contact_details: contactDetails,
+        contact_details: JSON.stringify({ email, phone, linkedin }),
         portfolio_url: portfolioUrl,
         location_or_company: locationOrCompany,
         last_contacted_date: lastContactedDate ? new Date(lastContactedDate).toISOString() : null,
@@ -68,7 +82,9 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
   const handleClose = () => {
     setName('');
     setRole('');
-    setContactDetails('');
+    setEmail('');
+    setPhone('');
+    setLinkedin('');
     setPortfolioUrl('');
     setLocationOrCompany('');
     setLastContactedDate('');
@@ -104,11 +120,30 @@ export default function AddConnectionModal({ open, onClose, onSubmit, initialDat
             />
             
             <TextField
-              label="Contact Details (Email/Phone/LinkedIn)"
+              label="Email Address"
               fullWidth
-              value={contactDetails}
-              onChange={(e) => setContactDetails(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. jane.doe@example.com"
+            />
+            
+            <TextField
+              label="Phone Number"
+              fullWidth
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +972523504079"
+            />
+
+            <TextField
+              label="LinkedIn Profile"
+              fullWidth
+              type="url"
+              value={linkedin}
+              onChange={(e) => setLinkedin(e.target.value)}
+              placeholder="e.g. https://linkedin.com/in/janedoe"
             />
 
             <TextField
