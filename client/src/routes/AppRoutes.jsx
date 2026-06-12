@@ -1,7 +1,8 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { trackEvent } from '../config/firebase';
 import { ProtectedRoute, PublicOnlyRoute } from './ProtectedRoute.jsx';
 
 const JobApplications = lazy(() => import('../pages/JobApplications'));
@@ -36,6 +37,12 @@ export default function AppRoutes({
   isLoading,
   onNotify,
 }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    trackEvent('page_view', { page_path: location.pathname + location.search });
+  }, [location]);
+
   return (
     <Routes>
       <Route

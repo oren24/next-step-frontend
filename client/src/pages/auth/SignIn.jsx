@@ -5,6 +5,7 @@ import { SignInPage } from '@toolpad/core/SignInPage';
 import { useAuth } from '../../auth/useAuth.js';
 import { signInWithGooglePopup } from '../../auth/googleAuth.js';
 import { signInWithLinkedInPopup } from '../../auth/linkedinAuth.js';
+import { trackEvent } from '../../config/firebase.js';
 import { ThemeToggle } from '../../components/layout/TopBarUtils.jsx';
 
 function SignUpPromptLink() {
@@ -41,6 +42,7 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
 
       try {
         await signIn({ email, password, remember });
+        trackEvent('login', { method: 'credentials' });
         navigate(redirectPath, { replace: true });
         return {};
       } catch (error) {
@@ -51,6 +53,7 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
     if (provider.id === 'github') {
       try {
         await signInWithProvider({ provider: 'github', remember: true });
+        trackEvent('login', { method: 'github' });
         navigate(redirectPath, { replace: true });
         return {};
       } catch (error) {
@@ -62,6 +65,7 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
       try {
         const linkedinProfile = await signInWithLinkedInPopup({ clientId: import.meta.env.VITE_LINKEDIN_CLIENT_ID });
         await signInWithProvider({ provider: 'linkedin', remember: true, profile: linkedinProfile });
+        trackEvent('login', { method: 'linkedin' });
         navigate(redirectPath, { replace: true });
         return {};
       } catch (error) {
@@ -73,6 +77,7 @@ export default function SignIn({ isDarkMode, onToggleTheme }) {
       try {
         const googleProfile = await signInWithGooglePopup({ clientId: googleClientId });
         await signInWithProvider({ provider: 'google', remember: true, profile: googleProfile });
+        trackEvent('login', { method: 'google' });
         navigate(redirectPath, { replace: true });
         return {};
       } catch (error) {
